@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
 body {
-    @apply bg-gray-600;
+    @apply h-screen min-h-screen;
+}
+
+@keyframes clignotement {
+    50% {
+        opacity: 1;
+    }
+
+    75% {
+        opacity: 0;
+    }
+}
+
+.clignotement {
+    animation: clignotement 1s infinite;
 }
