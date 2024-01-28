@@ -2,12 +2,20 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>
-			{% block title %}Welcome!
-			{% endblock %}
+		<title>SnowTricks |
+			{% block title %}{% endblock %}
 		</title>
-		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>"> {% block stylesheets %}{% endblock %}
-
+		<meta name="turbo-cache-control" content="no-cache">
+		<meta name="author" content="BOYER Thomas">
+		<meta name="copyright" content="BOYER Thomas">
+		<meta name="identifier-url" content="{{ app.request.host }}">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="SnowTricks est un site collaboratif sur le snowboard qui répertorie la liste des tricks connus.">
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="apple-touch-fullscreen" content="yes">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="msapplication-TileColor" content="#000091">
+		<meta name="theme-color" content="#000091">
 		{% block javascripts %}
 			{% block importmap %}
 				{{ importmap('app') }}
@@ -15,6 +23,9 @@
 		{% endblock %}
 	</head>
 	<body>
-		{% block body %}{% endblock %}
+		{% include "partials/_header.html.twig" %}
+		<div class="container mx-auto">
+			{% block body '' %}
+		</div>
 	</body>
 </html>
