@@ -2,8 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body {
+html {
     @apply h-screen min-h-screen;
 }
 
@@ -19,4 +18,8 @@ body {
 
 .clignotement {
     animation: clignotement 1s infinite;
+}
+
+a {
+    @apply !no-underline !text-inherit;
 }
