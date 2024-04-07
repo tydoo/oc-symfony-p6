@@ -25,4 +25,20 @@ return [
     '@hotwired/turbo' => [
         'version' => '7.3.0',
     ],
+    'mini-svg-data-uri' => [
+        'version' => '1.4.4',
+    ],
+    'picocolors' => [
+        'version' => '1.0.0',
+    ],
+    'bootstrap' => [
+        'version' => '5.3.3',
+    ],
+    '@popperjs/core' => [
+        'version' => '2.11.8',
+    ],
+    'bootstrap/dist/css/bootstrap.min.css' => [
+        'version' => '5.3.3',
+        'type' => 'css',
+    ],
 ];
