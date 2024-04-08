@@ -1,16 +1,20 @@
-<a href="{{ url('home.home') }}"><img src="{{absolute_url(asset('logo.svg'))}}" alt="Logo" style="width:50px;"></a>
-
+<a href="{{ url('home.home') }}">
+	<img src="{{absolute_url(asset('logo.svg'))}}" alt="Logo" style="width:50px;">
+</a>
+<br><br>
 <h1>Bienvenue sur SnowTricks !</h1>
-
-Merci de
-<a href="{{ signedUrl|raw }}">cliquer sur le lien</a>
-pour confirmer votre adresse email :
-{{ signedUrl|raw }}
-
-Ce lien expirera dans
-{{ expiresAtMessageKey|trans(expiresAtMessageData, 'VerifyEmailBundle') }}.
-Si vous n'avez pas demandé cette confirmation, vous pouvez ignorer cet email.
-
+<br>
+<p>Merci de
+	<a href="{{ signedUrl|raw }}">cliquer sur le lien</a>
+	pour confirmer votre adresse email :<br>
+	{{ signedUrl|raw }}
+</p>
+<br>
+<p>Ce lien expirera dans
+	{{ expiresAtMessageKey|trans(expiresAtMessageData, 'VerifyEmailBundle') }}.</p>
+<br>
+<p>Si vous n'avez pas demandé cette confirmation, vous pouvez ignorer cet email.</p>
+<br>
 Cordialement,
-
+<br><br>
 L'équipe SnowTricks
