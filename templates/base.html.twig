@@ -24,7 +24,8 @@
 	</head>
 	<body>
 		{% include "partials/_header.html.twig" %}
-		<div class="container mx-auto pb-[82px] md:mb-0">
+		<div class="container mx-auto pb-[82px] mt-8 md:mb-0">
+			{% include '_toasts.html.twig' %}
 			{% block body '' %}
 		</div>
 	</body>
