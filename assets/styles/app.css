@@ -23,3 +23,9 @@ html {
 a {
     @apply !no-underline !text-inherit;
 }
+
+
+.card,
+button {
+    @apply !rounded-sm;
+}
