@@ -4,25 +4,28 @@
 {% endblock %}
 
 {% block body %}
-	{% for flash_error in app.flashes('verify_email_error') %}
-		<div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-	{% endfor %}
 
-	<div class="flex items-center flex-col md:m-16 m-10 gap-8">
-		<a class="md:hidden p-4 hover:bg-neutral-100 active:bg-neutral-200 transition rounded-sm" href="{{ path('home.home') }}"><img src="{{asset('logo.svg')}}" alt="Logo" class="w-24"></a>
-		<h1>S'inscrire sur SnowTricks</h1>
-	</div>
+	<div class="w-full md:w-10/12 lg:w-8/12 xl:w-7/12 2xl:w-6/12 mx-auto">
+		{% for flash_error in app.flashes('verify_email_error') %}
+			<div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+		{% endfor %}
 
-	<div class="card md:m-8 mb-8">
-		<div class="card-body">
-			{{ form_start(registrationForm) }}
-			{{ form_row(registrationForm.username) }}
-			{{ form_row(registrationForm.email) }}
-			{{ form_row(registrationForm.plainPassword) }}
-			<div class=" flex justify-center mt-8">
-				{{ form_row(registrationForm.submit) }}
+		<div class="flex items-center flex-col md:m-16 m-10 gap-8">
+			<a class="md:hidden p-4 hover:bg-neutral-100 active:bg-neutral-200 transition rounded-sm" href="{{ path('home.home') }}"><img src="{{asset('logo.svg')}}" alt="Logo" class="w-24"></a>
+			<h1>S'inscrire sur SnowTricks</h1>
+		</div>
+
+		<div class="card md:m-8 mb-8">
+			<div class="card-body">
+				{{ form_start(registrationForm) }}
+				{{ form_row(registrationForm.username) }}
+				{{ form_row(registrationForm.email) }}
+				{{ form_row(registrationForm.plainPassword) }}
+				<div class=" flex justify-center mt-8">
+					{{ form_row(registrationForm.submit) }}
+				</div>
+				{{ form_end(registrationForm) }}
 			</div>
-			{{ form_end(registrationForm) }}
 		</div>
 	</div>
 {% endblock %}
