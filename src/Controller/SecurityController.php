@@ -76,7 +76,7 @@ class SecurityController extends AbstractController {
 
             $this->addFlash('success', 'Un email de confirmation a été envoyé à votre adresse email.');
 
-            return $this->redirectToRoute('home.home');
+            return $this->redirectToRoute('security.register');
         }
 
         return $this->render('security/register.html.twig', [
@@ -108,7 +108,7 @@ class SecurityController extends AbstractController {
         } catch (VerifyEmailExceptionInterface $exception) {
             $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
 
-            return $this->redirectToRoute('home.home');
+            return $this->redirectToRoute('security.register');
         }
 
         $security->login($user, LoginFormAuthenticator::class);
