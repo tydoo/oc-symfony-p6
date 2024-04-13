@@ -1,37 +1,28 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Se connecter
+{% endblock %}
 
 {% block body %}
-<form method="post">
-    {% if error %}
-        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
-
-    {% if app.user %}
-        <div class="mb-3">
-            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
-        </div>
-    {% endif %}
-
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <label for="inputUsername">Username</label>
-    <input type="text" value="{{ last_username }}" name="username" id="inputUsername" class="form-control" autocomplete="username" required autofocus>
-    <label for="inputPassword">Password</label>
-    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
-
-    <input type="hidden" name="_csrf_token"
-           value="{{ csrf_token('authenticate') }}"
-    >
-
-    <div class="checkbox mb-3">
-        <label>
-            <input type="checkbox" name="_remember_me"> Remember me
-        </label>
-    </div>
-
-    <button class="btn btn-lg btn-primary" type="submit">
-        Sign in
-    </button>
-</form>
+	{% if error %}
+		<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+	{% endif %}
+	<div class="w-full md:w-10/12 lg:w-8/12 xl:w-7/12 2xl:w-6/12 mx-auto">
+		<div class="flex justify-center">
+			<a class="md:hidden p-4 hover:bg-neutral-100 active:bg-neutral-200 transition rounded-sm" href="{{ path('home.home') }}"><img src="{{asset('logo.svg')}}" alt="Logo" class="w-24"></a>
+		</div>
+		<h1 class="text-center w-full mb-12 mt-6 md:mt-12">Se connecter sur SnowTricks</h1>
+		<div class="card md:m-8 mb-8">
+			<div class="card-body">
+				{{ form_start(loginForm) }}
+				{{ form_row(loginForm.username) }}
+				{{ form_row(loginForm.password) }}
+				{{ form_row(loginForm._remember_me) }}
+				<div class=" flex justify-center mt-8">
+					{{ form_row(loginForm.submit) }}
+				</div>
+				{{ form_end(loginForm) }}
+			</div>
+		</div>
+	</div>
 {% endblock %}
