@@ -43,6 +43,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private $isVerified = false;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $forgotPasswordToken = null;
+
     public function getId(): ?int {
         return $this->id;
     }
@@ -134,6 +137,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
 
     public function setVerified(bool $isVerified): static {
         $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    public function getForgotPasswordToken(): ?string
+    {
+        return $this->forgotPasswordToken;
+    }
+
+    public function setForgotPasswordToken(?string $forgotPasswordToken): static
+    {
+        $this->forgotPasswordToken = $forgotPasswordToken;
 
         return $this;
     }
