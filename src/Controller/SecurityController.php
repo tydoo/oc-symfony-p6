@@ -113,7 +113,7 @@ class SecurityController extends AbstractController {
 
         $security->login($user, LoginFormAuthenticator::class);
 
-        $this->addFlash('success', 'Votre email a été vérifié. Vous pouvez maintenant vous connecter.');
+        $this->addFlash('success', 'Votre email a été vérifié. Vous êtes maintenant connecté.');
 
         return $this->redirectToRoute('home.home');
     }
