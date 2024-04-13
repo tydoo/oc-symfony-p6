@@ -10,8 +10,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
-#[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[UniqueEntity(fields: ['username'], message: 'Il y a déjà un compte avec ce nom d\'utilisateur')]
+#[UniqueEntity(fields: ['email'], message: 'Il y a déjà un compte avec cet email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -39,7 +40,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $photo = null;
 
-    #[ORM\Column(type: 'boolean')]
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private $isVerified = false;
 
     public function getId(): ?int {
