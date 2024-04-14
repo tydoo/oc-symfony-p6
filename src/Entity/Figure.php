@@ -136,12 +136,12 @@ class Figure {
 
     #[ORM\PrePersist]
     public function onPrePersist() {
-        $this->createdAt = new DateTimeImmutable();
+        $this->createdAt = $this->createdAt ?? new DateTimeImmutable();
     }
 
     #[ORM\PreUpdate]
     public function onPreUpdate() {
-        $this->UpdatedAt = new DateTimeImmutable();
+        $this->UpdatedAt = $this->UpdatedAt ?? new DateTimeImmutable();
     }
 
     public function getSlug(): string {
