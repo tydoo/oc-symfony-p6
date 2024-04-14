@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\LoginType;
+use App\Form\ResetPasswordType;
 use App\Security\EmailVerifier;
 use App\Form\ForgotPasswordType;
 use App\Form\RegistrationFormType;
@@ -19,9 +20,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
@@ -140,8 +141,8 @@ class SecurityController extends AbstractController {
         $form = $this->createForm(ForgotPasswordType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $email = $form->get('email')->getData();
-            $user = $this->userRepository->findOneBy(['email' => $email]);
+            $username = $form->get('username')->getData();
+            $user = $this->userRepository->findOneBy(['username' => $username]);
             $token = bin2hex(openssl_random_pseudo_bytes(16));
             if ($user) {
                 $user->setForgotPasswordToken($token);
@@ -178,6 +179,32 @@ class SecurityController extends AbstractController {
         UserPasswordHasherInterface $userPasswordHasher
     ): Response {
         $user = $this->userRepository->findOneBy(['email' => $email]);
-        dd($user, $token, $email);
+        if (!$user || $user->getForgotPasswordToken() !== $token) {
+            $this->addFlash('danger', 'Token invalide');
+
+            return $this->redirectToRoute('security.forgot_password');
+        }
+
+        $form = $this->createForm(ResetPasswordType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->userRepository->upgradePassword(
+                $user,
+                $userPasswordHasher->hashPassword(
+                    $user,
+                    $form->get('password')->getData()
+                )
+            );
+            $user->setForgotPasswordToken(null);
+            $this->em->flush();
+
+            $this->addFlash('success', 'Votre mot de passe a été réinitialisé.');
+
+            return $this->redirectToRoute('security.login');
+        }
+
+        return $this->render('security/reset_password.html.twig', [
+            'resetPasswordForm' => $form,
+        ]);
     }
 }
