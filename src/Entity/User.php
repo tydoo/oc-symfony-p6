@@ -2,12 +2,16 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UserRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -46,6 +50,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $forgotPasswordToken = null;
 
+    /**
+     * @var Collection<int, Figure>
+     */
+    #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Figure::class)]
+    private Collection $figures;
+
+    #[ORM\Column]
+    private ?DateTimeImmutable $createdAt = null;
+
+    public function __construct() {
+        $this->figures = new ArrayCollection();
+    }
+
     public function getId(): ?int {
         return $this->id;
     }
@@ -55,7 +72,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
     }
 
     public function setUsername(string $username): static {
-        $this->username = $username;
+        $this->username = strtolower($username);
 
         return $this;
     }
@@ -116,7 +133,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
     }
 
     public function setEmail(string $email): static {
-        $this->email = $email;
+        $this->email = strtolower($email);
 
         return $this;
     }
@@ -141,15 +158,59 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
         return $this;
     }
 
-    public function getForgotPasswordToken(): ?string
-    {
+    public function getForgotPasswordToken(): ?string {
         return $this->forgotPasswordToken;
     }
 
-    public function setForgotPasswordToken(?string $forgotPasswordToken): static
-    {
+    public function setForgotPasswordToken(?string $forgotPasswordToken): static {
         $this->forgotPasswordToken = $forgotPasswordToken;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Figure>
+     */
+    public function getFigures(): Collection {
+        return $this->figures;
+    }
+
+    public function addFigure(Figure $figure): static {
+        if (!$this->figures->contains($figure)) {
+            $this->figures->add($figure);
+            $figure->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFigure(Figure $figure): static {
+        if ($this->figures->removeElement($figure)) {
+            // set the owning side to null (unless already changed)
+            if ($figure->getCreatedBy() === $this) {
+                $figure->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+
+    public function getCreatedAt(): ?DateTimeImmutable {
+        return $this->createdAt;
+    }
+
+    /**
+     * Do not call this method directly. It is only used by Doctrine events.
+     */
+    public function setCreatedAt(DateTimeImmutable $createdAt): static {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist() {
+        $this->createdAt = new DateTimeImmutable();
     }
 }
