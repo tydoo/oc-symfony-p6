@@ -211,6 +211,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
 
     #[ORM\PrePersist]
     public function onPrePersist() {
-        $this->createdAt = new DateTimeImmutable();
+        $this->createdAt = $this->createdAt ?? new DateTimeImmutable();
     }
 }
