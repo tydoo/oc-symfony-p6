@@ -8,14 +8,22 @@ use DateTimeImmutable;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Finder\Finder;
 
 class AppFixtures extends Fixture {
 
+    private string $uploadDir;
+
     public function __construct(
-        private string $projectDir,
+        private readonly string $projectDir,
         private readonly Filesystem $filesystem
     ) {
+        $this->uploadDir = $this->projectDir . DIRECTORY_SEPARATOR . 'uploads';
+
+        $finder = new Finder();
+        foreach ($finder->files()->in($this->uploadDir) as $file) {
+            $this->filesystem->remove($file->getRealPath());
+        }
     }
 
     public function load(ObjectManager $manager): void {
@@ -35,7 +43,7 @@ class AppFixtures extends Fixture {
 
             if ($photo) {
                 $name = bin2hex(random_bytes(16)) . '.jpg';
-                $url = $this->projectDir . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . $name;
+                $url = $this->uploadDir . DIRECTORY_SEPARATOR . $name;
                 $this->filesystem->dumpFile($url, file_get_contents($photo));
                 $user->setPhoto($name);
             }
