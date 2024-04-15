@@ -15,12 +15,8 @@ class File {
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    /**
-     * 1: photo
-     * 2: video
-     */
     #[ORM\Column]
-    private ?int $type = null;
+    private ?string $type = null;
 
     #[ORM\Column(length: 255)]
     private ?string $url = null;
@@ -43,11 +39,11 @@ class File {
         return $this;
     }
 
-    public function getType(): ?int {
+    public function getType(): ?string {
         return $this->type;
     }
 
-    public function setType(int $type): static {
+    public function setType(string $type): static {
         $this->type = $type;
 
         return $this;
@@ -71,13 +67,5 @@ class File {
         $this->figure = $figure;
 
         return $this;
-    }
-
-    public function isPhoto(): bool {
-        return $this->type === 1;
-    }
-
-    public function isVideo(): bool {
-        return $this->type === 2;
     }
 }

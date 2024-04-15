@@ -53,7 +53,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface {
     /**
      * @var Collection<int, Figure>
      */
-    #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Figure::class)]
+    #[ORM\OneToMany(
+        mappedBy: 'createdBy',
+        targetEntity: Figure::class,
+        cascade: ['persist'],
+    )]
     private Collection $figures;
 
     #[ORM\Column]

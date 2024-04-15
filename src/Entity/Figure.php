@@ -8,18 +8,13 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\FigureRepository;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_NAME', fields: ['name'])]
 #[UniqueEntity(fields: ['name'], message: 'Il y a déjà une figure avec ce nom')]
 #[ORM\Entity(repositoryClass: FigureRepository::class)]
 class Figure {
-
-    public function __construct(private readonly SluggerInterface $slugger) {
-        $this->files = new ArrayCollection();
-    }
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -51,7 +46,7 @@ class Figure {
     /**
      * @var Collection<int, File>
      */
-    #[ORM\OneToMany(mappedBy: 'figure', targetEntity: File::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'figure', targetEntity: File::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $files;
 
     public function getId(): ?int {
@@ -137,6 +132,7 @@ class Figure {
     #[ORM\PrePersist]
     public function onPrePersist() {
         $this->createdAt = $this->createdAt ?? new DateTimeImmutable();
+        $this->UpdatedAt = $this->UpdatedAt ?? new DateTimeImmutable();
     }
 
     #[ORM\PreUpdate]
@@ -145,7 +141,8 @@ class Figure {
     }
 
     public function getSlug(): string {
-        return $this->slugger->slug($this->name)->lower();
+        $slugger = new AsciiSlugger();
+        return $slugger->slug($this->name)->lower();
     }
 
     /**
