@@ -11,7 +11,9 @@ use App\Entity\File;
 use Symfony\Component\Finder\Finder;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Faker\Generator;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture {
 
@@ -19,7 +21,8 @@ class AppFixtures extends Fixture {
 
     public function __construct(
         private readonly string $projectDir,
-        private readonly Filesystem $filesystem
+        private readonly Filesystem $filesystem,
+        private readonly UserPasswordHasherInterface $passwordHasher
     ) {
         $this->uploadDir = $this->projectDir . DIRECTORY_SEPARATOR . 'uploads';
 
@@ -32,7 +35,28 @@ class AppFixtures extends Fixture {
     public function load(ObjectManager $manager): void {
         $faker = Factory::create('fr_FR');
 
-        //Création des utilisateurs
+        $this->createTydooAccount($manager);
+
+        $this->createUsers($faker, $manager);
+
+        $this->createCategories($manager);
+
+        $this->createFigures($faker, $manager);
+    }
+
+    private function createTydooAccount(ObjectManager $manager): void {
+        $user = (new User())
+            ->setUsername('tydoo')
+            ->setEmail('thomas@tydoo.fr')
+            ->setVerified(1);
+        $name = 'tydoo-' . bin2hex(random_bytes(16)) . '.jpg';
+        $url = $this->uploadDir . DIRECTORY_SEPARATOR . $name;
+        $this->filesystem->dumpFile($url, file_get_contents('https://avatar.iran.liara.run/public/boy?username=' . urlencode($user->getUsername())));
+        $user->setPhoto($name);
+        $manager->persist($user->setPassword($this->passwordHasher->hashPassword($user, '112233')));
+    }
+
+    private function createUsers(Generator $faker, ObjectManager $manager): void {
         for ($i = 0; $i < 50; $i++) {
             $user = (new User())
                 ->setUsername($faker->unique()->userName())
@@ -56,8 +80,9 @@ class AppFixtures extends Fixture {
             $manager->persist($user);
         }
         $manager->flush();
+    }
 
-        //Création des catégories de figures
+    private function createCategories(ObjectManager $manager): void {
         foreach ([
             'Grabs',
             'Rotations',
@@ -70,10 +95,10 @@ class AppFixtures extends Fixture {
                 ->setName($categoryName);
             $manager->persist($category);
         }
-
         $manager->flush();
+    }
 
-        //Création des figures
+    private function createFigures(Generator $faker, ObjectManager $manager): void {
         foreach ([
             [
                 'name' => 'Mute',
