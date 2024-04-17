@@ -24,7 +24,7 @@ class AppFixtures extends Fixture {
         private readonly Filesystem $filesystem,
         private readonly UserPasswordHasherInterface $passwordHasher
     ) {
-        $this->uploadDir = $this->projectDir . DIRECTORY_SEPARATOR . 'uploads';
+        $this->uploadDir = $this->projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'uploads';
 
         $finder = new Finder();
         foreach ($finder->files()->in($this->uploadDir) as $file) {
@@ -116,36 +116,6 @@ class AppFixtures extends Fixture {
                 'category' => 'Grabs'
             ],
             [
-                'name' => 'Stalefish',
-                'description' => 'Saisie de la carre backside de la planche entre les deux pieds avec la main arrière',
-                'category' => 'Grabs'
-            ],
-            [
-                'name' => 'Tail grab',
-                'description' => 'Saisie de la partie arrière de la planche, avec la main arrière',
-                'category' => 'Grabs'
-            ],
-            [
-                'name' => 'Nose grab',
-                'description' => 'Saisie de la partie avant de la planche, avec la main avant',
-                'category' => 'Grabs'
-            ],
-            [
-                'name' => 'Japan',
-                'description' => 'Saisie de l\'avant de la planche, avec la main avant, du côté de la carre frontside',
-                'category' => 'Grabs'
-            ],
-            [
-                'name' => 'Seat belt',
-                'description' => 'Saisie du carre frontside à l\'arrière avec la main avant',
-                'category' => 'Grabs'
-            ],
-            [
-                'name' => 'Method',
-                'description' => 'Saisie de la carre frontside de la planche entre les deux pieds avec la main arrière',
-                'category' => 'Grabs'
-            ],
-            [
                 'name' => '180',
                 'description' => 'Demie-rotation horizontale',
                 'category' => 'Rotations'
@@ -153,26 +123,6 @@ class AppFixtures extends Fixture {
             [
                 'name' => '360',
                 'description' => 'Rotation horizontale complète',
-                'category' => 'Rotations'
-            ],
-            [
-                'name' => '540',
-                'description' => 'Rotation d\'un tour et demi',
-                'category' => 'Rotations'
-            ],
-            [
-                'name' => '720',
-                'description' => 'Rotation de deux tours',
-                'category' => 'Rotations'
-            ],
-            [
-                'name' => '900',
-                'description' => 'Rotation de deux tours et demi',
-                'category' => 'Rotations'
-            ],
-            [
-                'name' => '1080',
-                'description' => 'Rotation de trois tours',
                 'category' => 'Rotations'
             ],
             [
@@ -186,36 +136,6 @@ class AppFixtures extends Fixture {
                 'category' => 'Flips'
             ],
             [
-                'name' => 'Switch back flip',
-                'description' => 'Rotation verticale en arrière, en position switch',
-                'category' => 'Flips'
-            ],
-            [
-                'name' => 'Switch front flip',
-                'description' => 'Rotation verticale en avant, en position switch',
-                'category' => 'Flips'
-            ],
-            [
-                'name' => 'Cork',
-                'description' => 'Rotation horizontale avec un dévers',
-                'category' => 'Flips'
-            ],
-            [
-                'name' => 'Underflip',
-                'description' => 'Rotation horizontale en arrière',
-                'category' => 'Flips'
-            ],
-            [
-                'name' => 'Mc Twist',
-                'description' => 'Rotation verticale en avant avec une vrille de 540°',
-                'category' => 'Flips'
-            ],
-            [
-                'name' => 'Rodeo',
-                'description' => 'Rotation horizontale en avant',
-                'category' => 'Flips'
-            ],
-            [
                 'name' => 'Slide',
                 'description' => 'Glissade sur une barre de slide',
                 'category' => 'Slides'
@@ -223,26 +143,6 @@ class AppFixtures extends Fixture {
             [
                 'name' => 'Lipslide',
                 'description' => 'Glissade sur le haut de la barre de slide',
-                'category' => 'Slides'
-            ],
-            [
-                'name' => 'Boardslide',
-                'description' => 'Glissade sur la barre de slide avec la planche perpendiculaire à la barre',
-                'category' => 'Slides'
-            ],
-            [
-                'name' => 'Noseslide',
-                'description' => 'Glissade sur la barre de slide avec le nose de la planche',
-                'category' => 'Slides'
-            ],
-            [
-                'name' => 'Tailslide',
-                'description' => 'Glissade sur la barre de slide avec le tail de la planche',
-                'category' => 'Slides'
-            ],
-            [
-                'name' => 'Bluntslide',
-                'description' => 'Glissade sur la barre de slide avec le tail de la planche',
                 'category' => 'Slides'
             ],
             [
@@ -254,31 +154,6 @@ class AppFixtures extends Fixture {
                 'name' => 'Japan air',
                 'description' => 'Saut avec une saisie Japan',
                 'category' => 'Old school'
-            ],
-            [
-                'name' => 'Rocket air',
-                'description' => 'Saut avec une saisie de la carre frontside de la planche entre les deux pieds avec la main avant',
-                'category' => 'Old school'
-            ],
-            [
-                'name' => 'Backside air',
-                'description' => 'Saut avec une rotation backside',
-                'category' => 'Old school'
-            ],
-            [
-                'name' => 'Frontside air',
-                'description' => 'Saut avec une rotation frontside',
-                'category' => 'Old school'
-            ],
-            [
-                'name' => 'Method air',
-                'description' => 'Saut avec une saisie Method',
-                'category' => 'Old school'
-            ],
-            [
-                'name' => 'Indy Nosebone',
-                'description' => 'Saut avec une saisie Indy et une extension du pied avant',
-                'category' => 'Old school'
             ]
         ] as $figure) {
             $userCreator = $faker->randomElement($manager->getRepository(User::class)->findAll());
@@ -288,7 +163,6 @@ class AppFixtures extends Fixture {
                 ->setCategory($manager->getRepository(Category::class)->findOneBy(['name' => $figure['category']]))
                 ->setCreatedBy($userCreator)
                 ->setUpdatedBy($userCreator);
-
 
             $name = 'tricks-' . bin2hex(random_bytes(16)) . '.jpg';
             $url = $this->uploadDir . DIRECTORY_SEPARATOR . $name;
