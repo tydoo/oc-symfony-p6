@@ -72,8 +72,7 @@ class AppFixtures extends Fixture {
 
             if ($photo) {
                 $name = 'avatar-' . bin2hex(random_bytes(16)) . '.jpg';
-                $url = $this->uploadDir . DIRECTORY_SEPARATOR . $name;
-                $this->filesystem->dumpFile($url, file_get_contents($photo));
+                $this->filesystem->dumpFile($this->uploadDir . DIRECTORY_SEPARATOR . $name, file_get_contents($photo));
                 $user->setPhoto($name);
             }
 
@@ -165,12 +164,11 @@ class AppFixtures extends Fixture {
                 ->setUpdatedBy($userCreator);
 
             $name = 'tricks-' . bin2hex(random_bytes(16)) . '.jpg';
-            $url = $this->uploadDir . DIRECTORY_SEPARATOR . $name;
-            $this->filesystem->dumpFile($url, file_get_contents($this->projectDir . DIRECTORY_SEPARATOR . 'images_tricks' . DIRECTORY_SEPARATOR . str_replace(' ', '', strtolower($figure['name'])) . '.jpg'));
+            $this->filesystem->dumpFile($this->uploadDir . DIRECTORY_SEPARATOR . $name, file_get_contents($this->projectDir . DIRECTORY_SEPARATOR . 'images_tricks' . DIRECTORY_SEPARATOR . str_replace(' ', '', strtolower($figure['name'])) . '.jpg'));
             $file = (new File)
                 ->setName($figure['name'])
                 ->setType('image')
-                ->setUrl($url)
+                ->setUrl($name)
                 ->setFigure($figureObject);
             $manager->persist($file);
             $manager->persist($figureObject);
