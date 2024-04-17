@@ -2,5 +2,46 @@
 {% block title 'Accueil' %}
 
 {% block body %}
-	Homepage
+	<div id="hero" class="relative flex justify-center items-center bg-center bg-cover h-[600px]" style="background-image:url({{ asset('images/snow.jpg') }})">
+		<div class="flex flex-col justify-center items-center">
+			<p class="text-6xl md:text-9xl font-bold pb-8 text-white">Snowtricks</p>
+			<p class="text-white text-lg mt-8 md:text-2xl font-semibold">Votre répertoire des tricks en Snow !</p>
+			{% if is_granted('ROLE_USER') %}
+				<p class="flex absolute bottom-0 items-center px-3 py-2 text-lg font-semibold m-0 bg-white rounded-t">Bienvenue
+					<img class="rounded-full h-6 mx-3" src="{{ asset('uploads/' ~ app.user.photo) }}" alt="avatar">
+					{{ app.user.username }}
+					!</p>
+			{% endif %}
+			<a href="#tricks" class="btn text-white absolute bottom-4 right-4 md:right-8 p-3 rounded">
+				<i class="fa-solid fa-arrow-down-to-line fa-2xl"></i>
+			</a>
+		</div>
+	</div>
+
+	<div id="tricks" class="mt-8 gap-8 px-4 grid grid-rows-1 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
+		{% for figure in figures %}
+			<div class="border border-gray-900 rounded-sm relative">
+				<img class="w-full h-48 object-cover" src="{{ asset('uploads/' ~ figure.files|first.url) }}" alt="{{ figure.name }}">
+				<div class="bg-white/85 flex justify-between items-center px-3 absolute bottom-0 right-0 left-0">
+					<a href="{{ path('tricks.show', {id:figure.id,slug:figure.getSlug()}) }}" class="my-3 font-semibold">{{ figure.name }}</a>
+					{% if is_granted('ROLE_USER') %}
+						<div>
+							<a class="btn" href="{{ path('tricks.edit', {id:figure.id,slug:figure.getSlug()}) }}">
+								<i class="fa-solid fa-pencil"></i>
+							</a>
+							<a class="btn" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette figure ?');" href="{{ path('tricks.delete', {id:figure.id,slug:figure.getSlug()}) }}">
+								<i class="fa-solid fa-trash"></i>
+							</a>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+
+	<div class="w-full flex justify-end p-4">
+		<a href="#hero" class="btn p-3 rounded text-black">
+			<i class="fa-solid fa-arrow-up-to-line fa-2xl"></i>
+		</a>
+	</div>
 {% endblock %}

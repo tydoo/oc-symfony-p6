@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\FigureRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,9 +16,9 @@ class HomeController extends AbstractController {
     }
 
     #[Route('/home', name: 'home.home', methods: ['GET'])]
-    public function home(): Response {
+    public function home(FigureRepository $figureRepository): Response {
         return $this->render('home.html.twig', [
-            'controller_name' => 'HomeController',
+            'figures' => $figureRepository->findAll(),
         ]);
     }
 }
