@@ -38,10 +38,11 @@
 			</div>
 		{% endfor %}
 	</div>
-
-	<div class="w-full flex justify-end p-4">
-		<a href="#hero" class="btn p-3 rounded text-black">
-			<i class="fa-solid fa-arrow-up-to-line fa-2xl"></i>
-		</a>
-	</div>
+	{% if figures|length > 15 %}
+		<div class="w-full flex justify-end p-4">
+			<a href="#hero" class="btn p-3 rounded text-black">
+				<i class="fa-solid fa-arrow-up-to-line fa-2xl"></i>
+			</a>
+		</div>
+	{% endif %}
 {% endblock %}
