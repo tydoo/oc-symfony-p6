@@ -24,8 +24,8 @@
 			<div id="medias" class="my-3 mx-4 hidden md:flex gap-2">
 				{% for photo in figure.photos %}
 					<div class="h-24">
-						<a target="_blanck" href="{{ asset('uploads/' ~ photo.path) }}">
-							<img class="h-full hover:!border-neutral-700 border-transparent border-2" src="{{ asset('uploads/' ~ photo.path) }}" alt="photo">
+						<a target="_blanck" href="{{ asset('upload/' ~ photo.path) }}">
+							<img class="h-full hover:!border-neutral-700 border-transparent border-2" src="{{ asset('upload/' ~ photo.path) }}" alt="photo">
 						</a>
 					</div>
 				{% endfor %}

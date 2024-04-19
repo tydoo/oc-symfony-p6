@@ -24,4 +24,4 @@
 /assets/vendor/
 ###< symfony/asset-mapper ###
 
-/public/uploads/*.jpg
+/public/upload/*.jpg

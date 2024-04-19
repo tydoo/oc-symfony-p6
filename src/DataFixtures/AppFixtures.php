@@ -114,13 +114,13 @@ class AppFixtures extends Fixture {
                 'name' => 'Indy',
                 'description' => 'Saisie de la carre frontside de la planche, entre les deux pieds, avec la main arrière',
                 'category' => 'Grabs',
-                'video' => 'https://www.youtube.com/embed/G_MEz7oJzro&pp=ugMICgJmchABGAHKBQpJbmR5IEdyYWJz'
+                'video' => 'https://www.youtube.com/embed/6yA3XqjTh_w'
             ],
             [
                 'name' => '180',
                 'description' => 'Demie-rotation horizontale',
                 'category' => 'Rotations',
-                'video' => 'https://www.youtube.com/embed/JMS2PGAFMcE&pp=ygUSMTgwIFJvdGF0aW9ucyBzbm93'
+                'video' => 'https://www.youtube.com/embed/2IqJcdFQiXk'
             ],
             [
                 'name' => '360',
