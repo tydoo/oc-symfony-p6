@@ -9,6 +9,7 @@ use App\Entity\Photo;
 use App\Entity\Video;
 use App\Entity\Figure;
 use DateTimeImmutable;
+use App\Entity\Message;
 use App\Entity\Category;
 use Symfony\Component\Finder\Finder;
 use Doctrine\Persistence\ObjectManager;
@@ -40,6 +41,8 @@ class AppFixtures extends Fixture {
         $this->createCategories($manager);
 
         $this->createFigures($faker, $manager);
+
+        $this->createMessages($faker, $manager);
     }
 
     private function createTydooAccount(ObjectManager $manager): void {
@@ -184,6 +187,19 @@ class AppFixtures extends Fixture {
             $manager->persist($figureObject);
         }
 
+        $manager->flush();
+    }
+
+    private function createMessages(Generator $faker, ObjectManager $manager): void {
+        $users = $manager->getRepository(User::class)->findAll();
+        for ($i = 0; $i < 100; $i++) {
+            $user = $faker->randomElement($users);
+            $message = (new Message())
+                ->setMessage($faker->sentence())
+                ->setCreatedAt(DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-6 months')))
+                ->setUser($user);
+            $manager->persist($message);
+        }
         $manager->flush();
     }
 }
