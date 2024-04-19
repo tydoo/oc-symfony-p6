@@ -22,11 +22,12 @@
 			{% endblock %}
 		{% endblock %}
 	</head>
-	<body>
+	<body class="flex flex-col justify-between">
 		{% include "partials/_header.html.twig" %}
-		<div class="pb-[82px] {{ app.request.attributes.get('_route') starts with 'security' ? 'mt-8 container mx-auto':''}}  md:mb-0">
+		<div class="pb-[82px] flex-grow {{ app.request.attributes.get('_route') starts with 'security' ? 'mt-8 container mx-auto':''}}  md:mb-0">
 			{% include '_toasts.html.twig' %}
 			{% block body '' %}
 		</div>
+		{% include "partials/_footer.html.twig" %}
 	</body>
 </html>
