@@ -227,19 +227,22 @@ class Figure {
         return $this;
     }
 
-    public function getFeaturedPhoto(): ?Photo {
+    public function getFeaturedPhoto(): string {
         $featuredPhoto = null;
         foreach ($this->photos as $photo) {
             if ($photo->isFeatured()) {
-                $featuredPhoto = $photo;
+                $featuredPhoto = 'upload/' . $photo->getPath();
                 break;
             }
         }
 
-        if ($featuredPhoto === null && !$this->photos->isEmpty()) {
-            $featuredPhoto = $this->photos->first();
+        if ($featuredPhoto === null) {
+            if (!$this->photos->isEmpty()) {
+                $featuredPhoto = 'upload/' . $this->photos->first()->getPath();
+            } else {
+                $featuredPhoto = 'tricks-default.jpg';
+            }
         }
-
         return $featuredPhoto;
     }
 }

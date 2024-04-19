@@ -23,7 +23,7 @@
 	<div id="tricks" class="mt-8 gap-8 px-4 grid grid-rows-1 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
 		{% for figure in figures %}
 			<div class="border border-gray-900 rounded-sm relative">
-				<img class="w-full h-48 object-cover" src="{{ asset('upload/' ~ figure.getFeaturedPhoto().path) }}" alt="{{ figure.name }}">
+				<img class="w-full h-48 object-cover" src="{{ asset(figure.getFeaturedPhoto()) }}" alt="{{ figure.name }}">
 				<div class="bg-white/85 flex justify-between items-center px-3 absolute bottom-0 right-0 left-0">
 					<a href="{{ path('tricks.show', {id:figure.id,slug:figure.getSlug()}) }}" class="my-3 font-semibold">{{ figure.name }}</a>
 					{% if is_granted('ROLE_USER') %}

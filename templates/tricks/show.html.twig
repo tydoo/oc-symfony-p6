@@ -6,7 +6,7 @@
 {% block body %}
 	<div id="hero" class="bg-center flex items-start justify-center bg-cover h-[600px]" style="background-image:url({{ asset('images/snow.jpg') }})">
 		<div class="rounded-sm bg-white border-1 border-neutral-700 md:!mt-28 block w-full md:w-[800px]" style="margin:0.75rem;">
-			<div class="relative h-[300px] bg-center bg-cover" style="background-image:url({{ asset('upload/' ~ figure.getFeaturedPhoto().path) }});">
+			<div class="relative h-[300px] bg-center bg-cover" style="background-image:url({{ asset(figure.getFeaturedPhoto()) }});">
 				<div class="flex flex-col justify-center items-center h-full">
 					<p class="text-7xl font-bold pb-8 text-white">{{ figure.name }}</p>
 				</div>
@@ -34,6 +34,11 @@
 						<iframe width="170" height="92" src="{{ video.path }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 					</div>
 				{% endfor %}
+
+				{% if figure.photos|length == 0 and figure.videos|length == 0 %}
+					<p class=" text-base font-medium">Aucun média présent sur cette fiche.</p>
+				{% endif %}
+
 			</div>
 			<div class="my-3 mx-4 md:hidden flex justify-center items-center">
 				<button id="showMedia" class="btn btn-primary">Voir les médias</button>

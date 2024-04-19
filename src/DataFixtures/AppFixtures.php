@@ -155,7 +155,8 @@ class AppFixtures extends Fixture {
             [
                 'name' => 'Japan air',
                 'description' => 'Saut avec une saisie Japan',
-                'category' => 'Old school'
+                'category' => 'Old school',
+                'image' => false
             ]
         ] as $figure) {
             $userCreator = $faker->randomElement($users);
@@ -166,12 +167,14 @@ class AppFixtures extends Fixture {
                 ->setCreatedBy($userCreator)
                 ->setUpdatedBy($userCreator);
 
-            $name = 'tricks-' . bin2hex(random_bytes(16)) . '.jpg';
-            $this->filesystem->dumpFile($this->uploadDir . DIRECTORY_SEPARATOR . $name, file_get_contents($this->projectDir . DIRECTORY_SEPARATOR . 'images_tricks' . DIRECTORY_SEPARATOR . str_replace(' ', '', strtolower($figure['name'])) . '.jpg'));
-            $figureObject->addPhoto((new Photo())
-                    ->setPath($name)
-                    ->setFeatured(true)
-            );
+            if (!isset($figure['image'])) {
+                $name = 'tricks-' . bin2hex(random_bytes(16)) . '.jpg';
+                $this->filesystem->dumpFile($this->uploadDir . DIRECTORY_SEPARATOR . $name, file_get_contents($this->projectDir . DIRECTORY_SEPARATOR . 'images_tricks' . DIRECTORY_SEPARATOR . str_replace(' ', '', strtolower($figure['name'])) . '.jpg'));
+                $figureObject->addPhoto((new Photo())
+                        ->setPath($name)
+                        ->setFeatured(true)
+                );
+            }
 
             if (isset($figure['video'])) {
                 $figureObject->addVideo((new Video())
