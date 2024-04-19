@@ -8,7 +8,9 @@
 			<p class="text-white text-lg mt-8 md:text-2xl font-semibold">Votre répertoire des tricks en Snow !</p>
 			{% if is_granted('ROLE_USER') %}
 				<p class="flex absolute bottom-0 items-center px-3 py-2 text-lg font-semibold m-0 bg-white rounded-t">Bienvenue
-					<img class="rounded-full h-6 mx-3" src="{{ asset('uploads/' ~ app.user.photo) }}" alt="avatar">
+					{% if app.user.photo %}
+						<img class="rounded-full h-6 mx-3" src="{{ asset('upload/' ~ app.user.photo) }}" alt="avatar">
+					{% endif %}
 					{{ app.user.username }}
 					!</p>
 			{% endif %}
