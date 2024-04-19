@@ -3,12 +3,13 @@
 namespace App\Entity;
 
 use DateTimeImmutable;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\FigureRepository;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Filesystem\Filesystem;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_NAME', fields: ['name'])]
@@ -44,10 +45,31 @@ class Figure {
     private ?User $updatedBy = null;
 
     /**
-     * @var Collection<int, File>
+     * @var Collection<int, Photo>
      */
-    #[ORM\OneToMany(mappedBy: 'figure', targetEntity: File::class, orphanRemoval: true, cascade: ['persist'])]
-    private Collection $files;
+    #[ORM\OneToMany(
+        mappedBy: 'figure',
+        targetEntity: Photo::class,
+        orphanRemoval: true,
+        cascade: ['persist', 'remove']
+    )]
+    private Collection $photos;
+
+    /**
+     * @var Collection<int, Video>
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'Figure',
+        targetEntity: Video::class,
+        orphanRemoval: true,
+        cascade: ['persist', 'remove']
+    )]
+    private Collection $videos;
+
+    public function __construct() {
+        $this->photos = new ArrayCollection();
+        $this->videos = new ArrayCollection();
+    }
 
     public function getId(): ?int {
         return $this->id;
@@ -145,30 +167,79 @@ class Figure {
         return $slugger->slug($this->name)->lower();
     }
 
-    /**
-     * @return Collection<int, File>
-     */
-    public function getFiles(): Collection {
-        return $this->files;
+    #[ORM\PreRemove]
+    public function onPreRemove() {
+        $fileSystem = new Filesystem();
+        $fileSystem->remove($_ENV['UPLOAD_DIR'] . $this->getName());
     }
 
-    public function addFile(File $file): static {
-        if (!$this->files->contains($file)) {
-            $this->files->add($file);
-            $file->setFigure($this);
+    /**
+     * @return Collection<int, Photo>
+     */
+    public function getPhotos(): Collection {
+        return $this->photos;
+    }
+
+    public function addPhoto(Photo $photo): static {
+        if (!$this->photos->contains($photo)) {
+            $this->photos->add($photo);
+            $photo->setFigure($this);
         }
 
         return $this;
     }
 
-    public function removeFile(File $file): static {
-        if ($this->files->removeElement($file)) {
+    public function removePhoto(Photo $photo): static {
+        if ($this->photos->removeElement($photo)) {
             // set the owning side to null (unless already changed)
-            if ($file->getFigure() === $this) {
-                $file->setFigure(null);
+            if ($photo->getFigure() === $this) {
+                $photo->setFigure(null);
             }
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Video>
+     */
+    public function getVideos(): Collection {
+        return $this->videos;
+    }
+
+    public function addVideo(Video $video): static {
+        if (!$this->videos->contains($video)) {
+            $this->videos->add($video);
+            $video->setFigure($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVideo(Video $video): static {
+        if ($this->videos->removeElement($video)) {
+            // set the owning side to null (unless already changed)
+            if ($video->getFigure() === $this) {
+                $video->setFigure(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getFeaturedPhoto(): ?Photo {
+        $featuredPhoto = null;
+        foreach ($this->photos as $photo) {
+            if ($photo->isFeatured()) {
+                $featuredPhoto = $photo;
+                break;
+            }
+        }
+
+        if ($featuredPhoto === null && !$this->photos->isEmpty()) {
+            $featuredPhoto = $this->photos->first();
+        }
+
+        return $featuredPhoto;
     }
 }

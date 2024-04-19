@@ -4,28 +4,26 @@ namespace App\DataFixtures;
 
 use Faker\Factory;
 use App\Entity\User;
+use Faker\Generator;
+use App\Entity\Photo;
+use App\Entity\Video;
 use App\Entity\Figure;
 use DateTimeImmutable;
 use App\Entity\Category;
-use App\Entity\File;
 use Symfony\Component\Finder\Finder;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Faker\Generator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture {
 
-    private string $uploadDir;
-
     public function __construct(
         private readonly string $projectDir,
+        private readonly string $uploadDir,
         private readonly Filesystem $filesystem,
         private readonly UserPasswordHasherInterface $passwordHasher
     ) {
-        $this->uploadDir = $this->projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'uploads';
-
         $finder = new Finder();
         foreach ($finder->files()->in($this->uploadDir) as $file) {
             $this->filesystem->remove($file->getRealPath());
@@ -98,26 +96,31 @@ class AppFixtures extends Fixture {
     }
 
     private function createFigures(Generator $faker, ObjectManager $manager): void {
+        $users = $manager->getRepository(User::class)->findAll();
         foreach ([
             [
                 'name' => 'Mute',
                 'description' => 'Saisie de la carre frontside de la planche entre les deux pieds avec la main avant',
                 'category' => 'Grabs',
+                'video' => 'https://www.youtube.com/embed/NnnsXEBwTHc'
             ],
             [
                 'name' => 'Sad',
                 'description' => 'Saisie de la carre backside de la planche, entre les deux pieds, avec la main avant',
-                'category' => 'Grabs'
+                'category' => 'Grabs',
+                'video' => 'https://www.youtube.com/embed/KEdFwJ4SWq4'
             ],
             [
                 'name' => 'Indy',
                 'description' => 'Saisie de la carre frontside de la planche, entre les deux pieds, avec la main arrière',
-                'category' => 'Grabs'
+                'category' => 'Grabs',
+                'video' => 'https://www.youtube.com/embed/G_MEz7oJzro&pp=ugMICgJmchABGAHKBQpJbmR5IEdyYWJz'
             ],
             [
                 'name' => '180',
                 'description' => 'Demie-rotation horizontale',
-                'category' => 'Rotations'
+                'category' => 'Rotations',
+                'video' => 'https://www.youtube.com/embed/JMS2PGAFMcE&pp=ygUSMTgwIFJvdGF0aW9ucyBzbm93'
             ],
             [
                 'name' => '360',
@@ -155,7 +158,7 @@ class AppFixtures extends Fixture {
                 'category' => 'Old school'
             ]
         ] as $figure) {
-            $userCreator = $faker->randomElement($manager->getRepository(User::class)->findAll());
+            $userCreator = $faker->randomElement($users);
             $figureObject = (new Figure())
                 ->setName($figure['name'])
                 ->setDescription($figure['description'])
@@ -165,12 +168,16 @@ class AppFixtures extends Fixture {
 
             $name = 'tricks-' . bin2hex(random_bytes(16)) . '.jpg';
             $this->filesystem->dumpFile($this->uploadDir . DIRECTORY_SEPARATOR . $name, file_get_contents($this->projectDir . DIRECTORY_SEPARATOR . 'images_tricks' . DIRECTORY_SEPARATOR . str_replace(' ', '', strtolower($figure['name'])) . '.jpg'));
-            $file = (new File)
-                ->setName($figure['name'])
-                ->setType('image')
-                ->setUrl($name)
-                ->setFigure($figureObject);
-            $manager->persist($file);
+            $figureObject->addPhoto((new Photo())
+                    ->setPath($name)
+                    ->setFeatured(true)
+            );
+
+            if (isset($figure['video'])) {
+                $figureObject->addVideo((new Video())
+                    ->setPath($figure['video']));
+            }
+
             $manager->persist($figureObject);
         }
 

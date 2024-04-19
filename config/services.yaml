@@ -26,3 +26,4 @@ services:
     App\DataFixtures\AppFixtures:
         arguments:
             - "%kernel.project_dir%"
+            - "%kernel.project_dir%%env(UPLOAD_DIR)%"
