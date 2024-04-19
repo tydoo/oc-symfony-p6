@@ -5,17 +5,16 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\LoginType;
 use App\Form\ResetPasswordType;
-use App\Security\EmailVerifier;
 use App\Form\ForgotPasswordType;
 use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
 use Symfony\Component\Mime\Address;
 use App\Security\LoginFormAuthenticator;
+use App\Service\SecurityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -25,13 +24,15 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 class SecurityController extends AbstractController {
     public function __construct(
-        private readonly EmailVerifier $emailVerifier,
+        private readonly SecurityService $securityService,
         private readonly UserRepository $userRepository,
-        private readonly EntityManagerInterface $em
+        private readonly EntityManagerInterface $em,
+        private readonly TranslatorInterface $translator
     ) {
     }
 
@@ -40,21 +41,19 @@ class SecurityController extends AbstractController {
         Request $request,
         AuthenticationUtils $authenticationUtils
     ): Response {
-        if ($this->getUser()) {
-            return $this->redirectToRoute('home.home');
-        }
+        $this->userIsLoggedIn();
 
         $form = $this->createForm(LoginType::class);
         $form->handleRequest($request);
         $form->get('username')->setData($authenticationUtils->getLastUsername());
 
-        $error = $authenticationUtils->getLastAuthenticationError();
         return $this->render('security/login.html.twig', [
             'loginForm' => $form,
-            'error' => $error
+            'error' => $authenticationUtils->getLastAuthenticationError()
         ]);
     }
 
+    #[IsGranted('ROLE_USER')]
     #[Route(path: '/logout', name: 'security.logout', methods: ['GET'])]
     public function logout(): void {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
@@ -65,6 +64,8 @@ class SecurityController extends AbstractController {
         Request $request,
         UserPasswordHasherInterface $userPasswordHasher
     ): Response {
+        $this->userIsLoggedIn();
+
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
@@ -80,15 +81,7 @@ class SecurityController extends AbstractController {
             $this->em->persist($user);
             $this->em->flush();
 
-            $this->emailVerifier->sendEmailConfirmation(
-                'security.verify_email',
-                $user,
-                (new TemplatedEmail())
-                    ->from(new Address('noreply@snowtricks.fr', 'SnowTricks'))
-                    ->to($user->getEmail())
-                    ->subject('Merci de confirmer votre email')
-                    ->htmlTemplate('security/confirmation_email.html.twig')
-            );
+            $this->securityService->sendEmailConfirmation($user);
 
             $this->addFlash('success', 'Un email de confirmation a été envoyé à votre adresse email.');
 
@@ -102,27 +95,21 @@ class SecurityController extends AbstractController {
 
     #[Route('/verify/email', name: 'security.verify_email', methods: ['GET'])]
     public function verifyUserEmail(
+        #[MapQueryParameter] int $id,
         Request $request,
-        TranslatorInterface $translator,
         Security $security
     ): RedirectResponse {
-        $id = $request->query->get('id');
-
-        if (null === $id) {
-            return $this->redirectToRoute('home.home');
-        }
+        $this->userIsLoggedIn();
 
         $user = $this->userRepository->find($id);
-
-        if (null === $user) {
+        if (!$user) {
             return $this->redirectToRoute('home.home');
         }
 
         try {
-            $this->emailVerifier->handleEmailConfirmation($request, $user);
+            $this->securityService->handleEmailConfirmation($request, $user);
         } catch (VerifyEmailExceptionInterface $exception) {
-            $this->addFlash('danger', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
-
+            $this->addFlash('danger', $this->translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
             return $this->redirectToRoute('security.register');
         }
 
@@ -134,31 +121,16 @@ class SecurityController extends AbstractController {
     }
 
     #[Route('/forgot-password', name: 'security.forgot_password', methods: ['GET', 'POST'])]
-    public function forgotPassword(
-        Request $request,
-        MailerInterface $mailer
-    ): Response {
+    public function forgotPassword(Request $request): Response {
+        $this->userIsLoggedIn();
+
         $form = $this->createForm(ForgotPasswordType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $username = $form->get('username')->getData();
-            $user = $this->userRepository->findOneBy(['username' => $username]);
-            $token = bin2hex(openssl_random_pseudo_bytes(16));
+            $user = $this->userRepository->findOneBy(['username' => $form->get('username')->getData()]);
+
             if ($user) {
-                $user->setForgotPasswordToken($token);
-                $this->em->flush();
-                $mailer->send((new TemplatedEmail())
-                    ->from(new Address('noreply@snowtricks.fr', 'SnowTricks'))
-                    ->to($user->getEmail())
-                    ->context([
-                        'resetPasswordToken' => $token,
-                        'signedUrl' => $this->generateUrl('security.reset_password', [
-                            'token' => $token,
-                            'email' => $user->getEmail()
-                        ], UrlGeneratorInterface::ABSOLUTE_URL),
-                    ])
-                    ->subject('Réinitialisation de votre mot de passe')
-                    ->htmlTemplate('security/reset_password_email.html.twig'));
+                $this->securityService->sendEmailForgotPassword($user);
             }
 
             $this->addFlash('success', 'Si votre adresse email est associée à un compte, un email vous a été envoyé pour réinitialiser votre mot de passe.');
@@ -173,15 +145,21 @@ class SecurityController extends AbstractController {
 
     #[Route('/reset-password', name: 'security.reset_password', methods: ['GET', 'POST'])]
     public function resetPassword(
-        #[MapQueryParameter] string $token,
-        #[MapQueryParameter] string $email,
+        #[MapQueryParameter] int $id,
         Request $request,
         UserPasswordHasherInterface $userPasswordHasher
     ): Response {
-        $user = $this->userRepository->findOneBy(['email' => $email]);
-        if (!$user || $user->getForgotPasswordToken() !== $token) {
-            $this->addFlash('danger', 'Token invalide');
+        $this->userIsLoggedIn();
 
+        $user = $this->userRepository->find($id);
+        if (!$user) {
+            return $this->redirectToRoute('home.home');
+        }
+
+        try {
+            $this->securityService->handleEmailConfirmation($request, $user);
+        } catch (VerifyEmailExceptionInterface $exception) {
+            $this->addFlash('danger', 'Ce lien de réinitialisation de mot de passe a expiré.');
             return $this->redirectToRoute('security.forgot_password');
         }
 
@@ -195,7 +173,6 @@ class SecurityController extends AbstractController {
                     $form->get('password')->getData()
                 )
             );
-            $user->setForgotPasswordToken(null);
             $this->em->flush();
 
             $this->addFlash('success', 'Votre mot de passe a été réinitialisé.');
@@ -206,5 +183,9 @@ class SecurityController extends AbstractController {
         return $this->render('security/reset_password.html.twig', [
             'resetPasswordForm' => $form,
         ]);
+    }
+
+    private function userIsLoggedIn(): ?RedirectResponse {
+        return $this->getUser() ? $this->redirectToRoute('home.home') : null;
     }
 }
