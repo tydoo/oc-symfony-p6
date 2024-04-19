@@ -4,9 +4,10 @@
 {% endblock %}
 
 {% block body %}
-	<div id="hero" class="bg-center flex items-start justify-center bg-cover h-[600px]" style="background-image:url({{ asset('images/snow.jpg') }})">
-		<div class="rounded-sm bg-white border-1 border-neutral-700 md:!mt-28 block w-full md:w-[800px]" style="margin:0.75rem;">
-			<div class="relative h-[300px] bg-center bg-cover" style="background-image:url({{ asset(figure.getFeaturedPhoto()) }});">
+	<div id="hero" class="flex items-start justify-center relative">
+		<div class="bg-cover blur-lg absolute top-0 right-0 left-0 bg-center h-[700px] w-full" style="background-image:url({{ asset('images/snow.jpg') }})"></div>
+		<div class="rounded-sm z-10 bg-white border-1 border-neutral-700 md:!mt-24 block w-full md:w-[992px]" style="margin:0.75rem;">
+			<div class="relative h-[400px] bg-center bg-cover" style="background-image:url({{ asset(figure.getFeaturedPhoto()) }});">
 				<div class="flex flex-col justify-center items-center h-full">
 					<p class="text-7xl font-bold pb-8 text-white">{{ figure.name }}</p>
 				</div>
@@ -21,27 +22,44 @@
 					</div>
 				{% endif %}
 			</div>
-			<div id="medias" class="my-3 mx-4 hidden md:flex gap-2">
+			<div id="medias" class="my-3 mx-4 hidden md:flex space-x-2 overflow-x-auto">
 				{% for photo in figure.photos %}
-					<div class="h-24">
-						<a target="_blanck" href="{{ asset('upload/' ~ photo.path) }}">
-							<img class="h-full hover:!border-neutral-700 border-transparent border-2" src="{{ asset('upload/' ~ photo.path) }}" alt="photo">
-						</a>
-					</div>
+					<a class="hover:!border-neutral-700 border-transparent border-2 w-[150px] flex justify-center items-stretch h-28 bg-center bg-cover bg-no-repeat flex-shrink-0 flex-none" target="_blanck" style="background-image:url({{ asset('upload/' ~ photo.path) }});" href="{{ asset('upload/' ~ photo.path) }}"></a>
 				{% endfor %}
 				{% for video in figure.videos %}
-					<div class="h-24 mt-[2px]">
-						<iframe width="170" height="92" src="{{ video.path }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-					</div>
+					<iframe class="mt-[2px] flex-shrink-0 flex-none" width="150" height="108" src="{{ video.path }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 				{% endfor %}
 
 				{% if figure.photos|length == 0 and figure.videos|length == 0 %}
 					<p class=" text-base font-medium">Aucun média présent sur cette fiche.</p>
 				{% endif %}
-
 			</div>
 			<div class="my-3 mx-4 md:hidden flex justify-center items-center">
 				<button id="showMedia" class="btn btn-primary">Voir les médias</button>
+			</div>
+			<p class="my-12 mx-20 text-justify text-base font-medium">{{ figure.description }}</p>
+			<div class="flex flex-wrap my-12 justify-center gap-2 mx-4">
+				<span class="badge text-bg-primary !text-base">{{ figure.category.name }}</span>
+				<span class="badge text-bg-secondary !text-base">Créer le :
+					{{ figure.createdAt|date('d/m/Y') }}</span>
+				<div class="badge text-bg-secondary !text-base !flex !items-center">
+					<p class="m-0">Créer par :</p>
+					{% if figure.createdBy.photo %}
+						<img class="rounded-full h-5 ml-2 mr-1" src="{{ asset('upload/' ~ figure.createdBy.photo) }}" alt="avatar">
+					{% endif %}
+					<p class="m-0 pl-1">{{ figure.createdBy.username }}</p>
+				</div>
+				{% if figure.createdAt != figure.updatedAt %}
+					<span class="badge text-bg-secondary !text-base">Mis à jour le :
+						{{ figure.updatedAt|date('d/m/Y') }}</span>
+					<div class="badge text-bg-secondary !text-base !flex !items-center">
+						<p class="m-0">Mis à jour par :</p>
+						{% if figure.updatedBy.photo %}
+							<img class="rounded-full h-5 ml-2 mr-1" src="{{ asset('upload/' ~ figure.updatedBy.photo) }}" alt="avatar">
+						{% endif %}
+						<p class="m-0 pl-1">{{ figure.updatedBy.username }}</p>
+					</div>
+				{% endif %}
 			</div>
 		</div>
 	</div>
