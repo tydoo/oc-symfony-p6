@@ -29,8 +29,8 @@ class TricksController extends AbstractController {
         FigureRepository $figureRepository
     ): Response {
         $figure = $figureRepository->find($id);
-        if ($figure->getSlug() !== $slug) {
-            return $this->createNotFoundException('Aucune figure ne correspond à ce slug ou cet id.');
+        if (!$figure || $figure->getSlug() !== $slug) {
+            throw $this->createNotFoundException('Aucune figure trouvé !');
         }
 
         return $this->render('tricks/show.html.twig', [
@@ -51,8 +51,8 @@ class TricksController extends AbstractController {
         FigureRepository $figureRepository
     ): Response {
         $figure = $figureRepository->find($id);
-        if ($figure->getSlug() !== $slug) {
-            return $this->createNotFoundException('Aucune figure ne correspond à ce slug ou cet id.');
+        if (!$figure || $figure->getSlug() !== $slug) {
+            throw $this->createNotFoundException('Aucune figure trouvé !');
         }
 
         return $this->render('tricks/edit.html.twig', [
@@ -73,8 +73,8 @@ class TricksController extends AbstractController {
         FigureRepository $figureRepository
     ): Response {
         $figure = $figureRepository->find($id);
-        if ($figure->getSlug() !== $slug) {
-            return $this->createNotFoundException('Aucune figure ne correspond à ce slug ou cet id.');
+        if (!$figure || $figure->getSlug() !== $slug) {
+            throw $this->createNotFoundException('Aucune figure trouvé !');
         }
 
         $this->em->remove($figure);
