@@ -78,6 +78,30 @@ class TricksController extends AbstractController {
 
     #[IsGranted('ROLE_USER')]
     #[Route(
+        path: '/tricks/{id}-{slug}/delete',
+        name: 'tricks.delete',
+        methods: ['GET'],
+        requirements: ['id' => '\d+', 'slug' => '[a-z0-9-]+']
+    )]
+    public function delete(
+        int $id,
+        string $slug
+    ): Response {
+        $figure = $this->figureRepository->find($id);
+        if (!$figure || $figure->getSlug() !== $slug) {
+            throw $this->createNotFoundException('Aucune figure trouvé !');
+        }
+
+        $this->em->remove($figure);
+        $this->em->flush();
+
+        $this->addFlash('success', 'La figure a bien été supprimée !');
+
+        return $this->redirectToRoute('home.home');
+    }
+
+    #[IsGranted('ROLE_USER')]
+    #[Route(
         path: '/tricks/{id}-{slug}/edit',
         name: 'tricks.edit',
         methods: ['GET', 'POST'],
@@ -99,25 +123,11 @@ class TricksController extends AbstractController {
 
     #[IsGranted('ROLE_USER')]
     #[Route(
-        path: '/tricks/{id}-{slug}/delete',
-        name: 'tricks.delete',
-        methods: ['GET'],
-        requirements: ['id' => '\d+', 'slug' => '[a-z0-9-]+']
+        path: '/tricks/new',
+        name: 'tricks.create',
+        methods: ['GET', 'POST']
     )]
-    public function delete(
-        int $id,
-        string $slug
-    ): Response {
-        $figure = $this->figureRepository->find($id);
-        if (!$figure || $figure->getSlug() !== $slug) {
-            throw $this->createNotFoundException('Aucune figure trouvé !');
-        }
-
-        $this->em->remove($figure);
-        $this->em->flush();
-
-        $this->addFlash('success', 'La figure a bien été supprimée !');
-
-        return $this->redirectToRoute('home.home');
+    public function create(): Response {
+        return $this->render('tricks/edit.html.twig', []);
     }
 }
