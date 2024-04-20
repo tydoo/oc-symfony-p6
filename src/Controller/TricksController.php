@@ -64,7 +64,7 @@ class TricksController extends AbstractController {
         $page = $page ?: 1;
 
         $messagesCount = $messageRepository->count([]);
-        $messages = $messageRepository->findBy([], ['createdAt' => 'DESC'], 10 * $page,);
+        $messages = $messageRepository->findBy([], ['createdAt' => 'DESC'], 10 * $page);
         $lastPage = (int) ceil($messagesCount / 10);
 
         return $this->render('tricks/show.html.twig', [
