@@ -88,7 +88,7 @@
 						</div>
 					{% endfor %}
 				</div>
-				{% set pageSelected = app.request.query.get('page')|number_format < lastPage ? (app.request.query.get('page') is null ? 2 : app.request.query.get('page')|number_format + 1) : false %}
+				{% set pageSelected = page < lastPage ? page + 1 : false %}
 				{% if pageSelected %}
 					<div class="flex justify-center m-4">
 						<a href="{{ path( 'tricks.show', {id:app.request.attributes.get('id'), slug:app.request.attributes.get('slug'), page:pageSelected} ) }}#discussion-bottom" class="btn btn-secondary !text-white">Charger plus ...</a>
