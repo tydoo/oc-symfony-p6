@@ -34,3 +34,27 @@ button {
 .card {
     @apply !shadow-sm;
 }
+
+.delete {
+    background: url('../images/delete.png');
+    background-position: top;
+    cursor: pointer;
+    height: 12px;
+    width: 11px;
+
+    &:hover {
+        background-position: bottom;
+    }
+}
+
+.report {
+    background: url('../images/report.png');
+    background-position: top;
+    cursor: pointer;
+    height: 12px;
+    width: 10px;
+
+    &:hover {
+        background-position: bottom;
+    }
+}

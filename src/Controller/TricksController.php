@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -30,6 +31,7 @@ class TricksController extends AbstractController {
     public function show(
         int $id,
         string $slug,
+        #[MapQueryParameter] ?string $page,
         MessageRepository $messageRepository,
         Request $request
     ): Response {
@@ -59,10 +61,18 @@ class TricksController extends AbstractController {
             ]);
         }
 
+        $page = $page ?: 1;
+
+        $messagesCount = $messageRepository->count([]);
+        $messages = $messageRepository->findBy([], ['createdAt' => 'DESC'], 10 * $page,);
+        $lastPage = (int) ceil($messagesCount / 10);
+
         return $this->render('tricks/show.html.twig', [
             'figure' => $figure,
-            'messages' => $messageRepository->findAll(),
+            'messages' => $messages,
             'createMessageForm' => $form,
+            'page' => $page,
+            'lastPage' => $lastPage,
         ]);
     }
 

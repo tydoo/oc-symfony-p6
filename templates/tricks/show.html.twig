@@ -66,6 +66,39 @@
 					{{ form(createMessageForm, {attr:{class:'flex justify-center items-center gap-4 w-full'}}) }}
 					</div>
 				{% endif %}
+				<div class="my-6 mx-20 flex flex-col gap-2">
+					{% for message in messages %}
+						<div id="message_{{message.id}}" class="flex items-start gap-2">
+							<div class="flex flex-col justify-center items-center w-28">
+								{% if message.user.photo %}
+									<img class="rounded-full h-6 w-6" src="{{ asset('upload/' ~ message.user.photo) }}" alt="avatar">
+								{% endif %}
+								<p class="m-0 text-xs mt-1 flex">{{ message.user.username }}</p>
+							</div>
+							<div class="flex py-1 px-2 w-full relative border flex-col justify-center items-start ml-4">
+								<div class="absolute top-[2px] flex right-[2px]">
+									<a onclick="return confirm('Êtes-vous sûr de vouloir signaler ce message ?');" href="{{ path('messages.report', {id:message.id}) }}" class="report"></a>
+									{% if message.user == app.user %}
+										<a onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce message ?');" href="{{ path('messages.delete', {id:message.id}) }}" class="delete"></a>
+									{% endif %}
+								</div>
+								<p class="m-0 text-base pr-2">{{ message.message }}</p>
+								<p class="m-0 text-xs mt-1 pr-2">{{ message.createdAt|date('d/m/Y H:i') }}</p>
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+				{% set pageSelected = app.request.query.get('page')|number_format < lastPage ? (app.request.query.get('page') is null ? 2 : app.request.query.get('page')|number_format + 1) : false %}
+				{% if pageSelected %}
+					<div class="flex justify-center m-4">
+						<a href="{{ path( 'tricks.show', {id:app.request.attributes.get('id'), slug:app.request.attributes.get('slug'), page:pageSelected} ) }}#discussion-bottom" class="btn btn-secondary !text-white">Charger plus ...</a>
+					</div>
+				{% else %}
+					<div class="flex justify-center m-4">
+						<p class="text-base font-medium">Aucun message supplémentaire à charger.</p>
+					</div>
+				{% endif %}
+				<div id="discussion-bottom"></div>
 			</div>
 		</div>
 	{% endblock %}

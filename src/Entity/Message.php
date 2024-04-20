@@ -25,6 +25,9 @@ class Message {
     #[ORM\Column(length: 255)]
     private ?string $message = null;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private ?bool $reported = false;
+
     public function getId(): ?int {
         return $this->id;
     }
@@ -65,5 +68,15 @@ class Message {
     #[ORM\PrePersist]
     public function onPrePersist() {
         $this->createdAt = $this->createdAt ?? new DateTimeImmutable();
+    }
+
+    public function isReported(): ?bool {
+        return $this->reported;
+    }
+
+    public function setReported(bool $reported): static {
+        $this->reported = $reported;
+
+        return $this;
     }
 }
