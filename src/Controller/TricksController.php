@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Form\CreateMessageType;
+use App\Form\TricksType;
 use App\Repository\FigureRepository;
 use App\Repository\MessageRepository;
 use Doctrine\ORM\EntityManager;
@@ -109,15 +110,21 @@ class TricksController extends AbstractController {
     )]
     public function edit(
         int $id,
-        string $slug
+        string $slug,
+        Request $request
     ): Response {
         $figure = $this->figureRepository->find($id);
         if (!$figure || $figure->getSlug() !== $slug) {
             throw $this->createNotFoundException('Aucune figure trouvé !');
         }
 
+        $form = $this->createForm(TricksType::class, $figure);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+        }
+
         return $this->render('tricks/edit.html.twig', [
-            'figure' => $figure,
+            'tricksForm' => $form,
         ]);
     }
 
