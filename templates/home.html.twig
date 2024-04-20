@@ -40,9 +40,21 @@
 			</div>
 		{% endfor %}
 	</div>
+	{% set pageSelected = page < lastPage ? page + 1 : false %}
+	{% if pageSelected %}
+		<div class="flex justify-center m-4">
+			<a href="{{ path( 'home.home', {page:pageSelected} ) }}#tricks-bottom" class="btn btn-secondary !text-white">Charger plus ...</a>
+		</div>
+	{% else %}
+		<div class="flex justify-center m-4">
+			<p class="text-base font-medium">Aucun tricks supplémentaire à charger.</p>
+		</div>
+	{% endif %}
+	<div id="tricks-bottom"></div>
+
 	<div class="w-full flex justify-end p-4">
-		{% if figures|length > 15 %}
-			<a href="#hero" class="btn p-3 rounded text-black">
+		{% if page > 1 %}
+			<a href="#tricks" class="btn p-3 rounded text-black">
 				<i class="fa-solid fa-arrow-up-to-line fa-2xl"></i>
 			</a>
 		{% endif %}
