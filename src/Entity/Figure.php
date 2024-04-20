@@ -152,13 +152,13 @@ class Figure {
     }
 
     #[ORM\PrePersist]
-    public function onPrePersist() {
+    public function onPrePersist(): void {
         $this->createdAt = $this->createdAt ?? new DateTimeImmutable();
         $this->UpdatedAt = $this->UpdatedAt ?? new DateTimeImmutable();
     }
 
     #[ORM\PreUpdate]
-    public function onPreUpdate() {
+    public function onPreUpdate(): void {
         $this->UpdatedAt = $this->UpdatedAt ?? new DateTimeImmutable();
     }
 
@@ -168,7 +168,7 @@ class Figure {
     }
 
     #[ORM\PreRemove]
-    public function onPreRemove() {
+    public function onPreRemove(): void {
         $fileSystem = new Filesystem();
         $fileSystem->remove($_ENV['UPLOAD_DIR'] . $this->getName());
     }

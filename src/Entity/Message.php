@@ -66,7 +66,7 @@ class Message {
     }
 
     #[ORM\PrePersist]
-    public function onPrePersist() {
+    public function onPrePersist(): void {
         $this->createdAt = $this->createdAt ?? new DateTimeImmutable();
     }
 
