@@ -27,16 +27,22 @@
 			</div>
 			{% if figure.id %}
 				<div id="medias" class="my-3 mx-4 hidden md:flex space-x-2 overflow-x-auto">
+					<button class="btn btn-primary mt-[2px] mb-3 !px-[60px]">Ajouter une photo</button>
 					{% for photo in figure.photos %}
-						<a class="hover:!border-neutral-700 border-transparent border-2 w-[150px] flex justify-center items-stretch h-28 bg-center bg-cover bg-no-repeat flex-shrink-0 flex-none" target="_blanck" style="background-image:url({{ asset('upload/' ~ photo.path) }});" href="{{ asset('upload/' ~ photo.path) }}"></a>
+						<div>
+							<a class="hover:!border-neutral-700 border-transparent border-2 w-[150px] flex justify-center items-stretch h-28 bg-center bg-cover bg-no-repeat flex-shrink-0 flex-none" target="_blanck" style="background-image:url({{ asset('upload/' ~ photo.path) }});" href="{{ asset('upload/' ~ photo.path) }}"></a>
+							<div class="my-2 flex justify-end items-center">
+								<div class="flex border p-1">
+									<a class="btn" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette photo ?');" href="{{ path('tricks.delete_photo', {path:photo.path}) }}">
+										<i class="fa-solid fa-trash fa-sm"></i>
+									</a>
+								</div>
+							</div>
+						</div>
 					{% endfor %}
 					{% for video in figure.videos %}
 						<iframe class="mt-[2px] flex-shrink-0 flex-none" width="150" height="108" src="{{ video.path }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 					{% endfor %}
-
-					{% if figure.photos|length == 0 and figure.videos|length == 0 %}
-						<p class=" text-base font-medium">Aucun média présent sur cette fiche.</p>
-					{% endif %}
 				</div>
 				<div class="my-3 mx-4 md:hidden flex justify-center items-center">
 					<button id="showMedia" class="btn btn-primary">Voir les médias</button>

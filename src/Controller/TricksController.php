@@ -27,7 +27,8 @@ class TricksController extends AbstractController {
         private readonly string $uploadDir,
         private readonly EntityManagerInterface $em,
         private readonly FigureRepository $figureRepository,
-        private readonly Filesystem $filesystem
+        private readonly Filesystem $filesystem,
+        private readonly PhotoRepository $photoRepository,
     ) {
         $this->uploadFQDNDir = $this->projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . $this->uploadDir;
     }
@@ -148,14 +149,13 @@ class TricksController extends AbstractController {
         methods: ['GET']
     )]
     public function deleteFeaturedImage(
-        PhotoRepository $photoRepository,
         int $id,
         string $slug
     ): Response {
         $figure = $this->getFigureFromIdAndSlug($id, $slug);
 
         $path = str_replace('upload/', '', $figure->getFeaturedPhoto());
-        $photo = $photoRepository->findOneBy(['path' => $path]);
+        $photo = $this->photoRepository->findOneBy(['path' => $path]);
         if (!$photo) {
             throw $this->createNotFoundException('Aucune image trouvée !');
         }
@@ -210,5 +210,30 @@ class TricksController extends AbstractController {
         }
 
         return $figure;
+    }
+
+    #[IsGranted('ROLE_USER')]
+    #[Route(
+        path: '/tricks/photos/{path}/delete',
+        name: 'tricks.delete_photo',
+        methods: ['GET']
+    )]
+    public function delete_photo(string $path): Response {
+        $photo = $this->photoRepository->findOneBy(['path' => $path]);
+        if (!$photo) {
+            throw $this->createNotFoundException('Aucune image trouvée !');
+        }
+
+        $this->filesystem->remove($this->uploadFQDNDir . DIRECTORY_SEPARATOR . $path);
+
+        $this->em->remove($photo);
+        $this->em->flush();
+
+        $this->addFlash('success', 'La photo a bien été supprimée !');
+
+        return $this->redirectToRoute('tricks.edit', [
+            'id' => $photo->getFigure()->getId(),
+            'slug' => $photo->getFigure()->getSlug(),
+        ]);
     }
 }
