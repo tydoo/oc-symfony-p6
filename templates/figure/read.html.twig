@@ -10,7 +10,7 @@
 		<div class="rounded-sm z-10 bg-white border-1 border-neutral-700 md:!mt-24 block w-full md:w-[992px]" style="margin:0.75rem;">
 			<div class="relative h-[400px] bg-center bg-cover" style="background-image:url({{ asset(figure.getFeaturedPhoto() ? 'upload/' ~ figure.getFeaturedPhoto() : 'tricks-default.jpg') }});">
 				<div class="flex flex-col justify-center items-center h-full">
-					<p class="text-7xl text-center font-bold pb-8 text-white">{{ figure.name }}</p>
+					<p class="text-7xl text-white mix-blend-difference text-center font-bold pb-8">{{ figure.name }}</p>
 				</div>
 				{% if is_granted('ROLE_USER') %}
 					<div class="border absolute top-2 right-2 p-1 bg-white/70 rounded-sm">
