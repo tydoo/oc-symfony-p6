@@ -218,7 +218,7 @@ class TricksController extends AbstractController {
         name: 'tricks.delete_photo',
         methods: ['GET']
     )]
-    public function delete_photo(string $path): Response {
+    public function deletePhoto(string $path): Response {
         $photo = $this->photoRepository->findOneBy(['path' => $path]);
         if (!$photo) {
             throw $this->createNotFoundException('Aucune image trouvée !');
