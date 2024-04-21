@@ -220,26 +220,19 @@ class Figure {
         return $this;
     }
 
-    public function getFeaturedPhoto(): string {
+    public function getFeaturedPhoto(): ?string {
         $featuredPhoto = null;
         foreach ($this->photos as $photo) {
             if ($photo->isFeatured()) {
-                $featuredPhoto = 'upload/' . $photo->getPath();
+                $featuredPhoto = $photo->getPath();
                 break;
             }
         }
 
-        if ($featuredPhoto === null) {
-            if (!$this->photos->isEmpty()) {
-                $featuredPhoto = 'upload/' . $this->photos->first()->getPath();
-            } else {
-                $featuredPhoto = 'tricks-default.jpg';
-            }
+        if ($featuredPhoto === null && !$this->photos->isEmpty()) {
+            $featuredPhoto = $this->photos->first()->getPath();
         }
-        return $featuredPhoto;
-    }
 
-    public function haveFeaturedPhoto(): bool {
-        return $this->getFeaturedPhoto() !== 'tricks-default.jpg';
+        return $featuredPhoto;
     }
 }

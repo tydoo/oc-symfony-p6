@@ -23,11 +23,10 @@ class AppFixtures extends Fixture {
 
     public function __construct(
         private readonly string $projectDir,
-        private readonly string $uploadDir,
         private readonly Filesystem $filesystem,
         private readonly UserPasswordHasherInterface $passwordHasher
     ) {
-        $this->uploadFQDNDir = $this->projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . $this->uploadDir;
+        $this->uploadFQDNDir = $this->projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'upload';
 
         $finder = new Finder();
         foreach ($finder->files()->in($this->uploadFQDNDir) as $file) {

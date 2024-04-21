@@ -8,15 +8,15 @@
 	<div id="hero" class="flex items-start justify-center relative">
 		<div class="bg-cover blur-lg absolute top-0 right-0 left-0 bg-center h-[700px] w-full" style="background-image:url({{ asset('images/snow.jpg') }})"></div>
 		<div class="rounded-sm z-10 bg-white border-1 border-neutral-700 md:!mt-24 block w-full md:w-[992px]" style="margin:0.75rem;">
-			<div class="relative h-[400px] bg-center bg-cover" style="background-image:url({{ asset(figure.getFeaturedPhoto()) }});">
+			<div class="relative h-[400px] bg-center bg-cover" style="background-image:url({{ asset(figure.getFeaturedPhoto() ? 'upload/' ~ figure.getFeaturedPhoto() : 'tricks-default.jpg') }});">
 				<div class="flex flex-col justify-center items-center h-full">
 					<p class="text-7xl text-center font-bold pb-8 text-white">{{ figure.name ?? 'Nouveau tricks' }}</p>
 				</div>
 				{% if figure.id %}
 					<div class="border absolute flex gap-1 top-2 right-2 p-1 bg-white/70 rounded-sm">
 						{{ form(featuredPhotoForm) }}
-							{% if figure.haveFeaturedPhoto() %}
-								<a class="btn" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette image à la une ?');" href="{{ path('tricks.delete_featured_image', {id:figure.id,slug:figure.getSlug()}) }}">
+							{% if figure.getFeaturedPhoto() %}
+								<a class="btn" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette image à la une ?');" href="{{ path('photos.delete', {path:figure.getFeaturedPhoto()}) }}">
 									<i class="fa-solid fa-trash"></i>
 								</a>
 							{% endif %}
@@ -31,7 +31,7 @@
 								<a class="hover:!border-neutral-700 border-transparent border-2 w-[150px] flex justify-center items-stretch h-28 bg-center bg-cover bg-no-repeat flex-shrink-0 flex-none" target="_blanck" style="background-image:url({{ asset('upload/' ~ photo.path) }});" href="{{ asset('upload/' ~ photo.path) }}"></a>
 								<div class="my-2 flex justify-end items-center">
 									<div class="flex border p-1">
-										<a class="btn" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette photo ?');" href="{{ path('tricks.delete_photo', {path:photo.path}) }}">
+										<a class="btn" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette photo ?');" href="{{ path('photos.delete', {path:photo.path}) }}">
 											<i class="fa-solid fa-trash fa-sm"></i>
 										</a>
 									</div>
@@ -53,7 +53,7 @@
 					{{form_row(tricksForm.category)}}
 					<div class="flex justify-center gap-6 mt-10 md:justify-end">
 						{% if figure.id %}
-							<a onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette figure ?');" href="{{ path('tricks.delete', {id:figure.id,slug:figure.getSlug()}) }}" class="btn text-white btn-danger btn-primary">Supprimer</a>
+							<a onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette figure ?');" href="{{ path('figure.delete', {id:figure.id,slug:figure.getSlug()}) }}" class="btn text-white btn-danger btn-primary">Supprimer</a>
 						{% endif %}
 						{{form_row(tricksForm.submit)}}
 					</div>

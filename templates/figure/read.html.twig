@@ -8,16 +8,16 @@
 	<div id="hero" class="flex items-start justify-center relative">
 		<div class="bg-cover blur-lg absolute top-0 right-0 left-0 bg-center h-[700px] w-full" style="background-image:url({{ asset('images/snow.jpg') }})"></div>
 		<div class="rounded-sm z-10 bg-white border-1 border-neutral-700 md:!mt-24 block w-full md:w-[992px]" style="margin:0.75rem;">
-			<div class="relative h-[400px] bg-center bg-cover" style="background-image:url({{ asset(figure.getFeaturedPhoto()) }});">
+			<div class="relative h-[400px] bg-center bg-cover" style="background-image:url({{ asset(figure.getFeaturedPhoto() ? 'upload/' ~ figure.getFeaturedPhoto() : 'tricks-default.jpg') }});">
 				<div class="flex flex-col justify-center items-center h-full">
 					<p class="text-7xl text-center font-bold pb-8 text-white">{{ figure.name }}</p>
 				</div>
 				{% if is_granted('ROLE_USER') %}
 					<div class="border absolute top-2 right-2 p-1 bg-white/70 rounded-sm">
-						<a class="btn" href="{{ path('tricks.edit', {id:figure.id,slug:figure.getSlug()}) }}">
+						<a class="btn" href="{{ path('figure.update', {id:figure.id,slug:figure.getSlug()}) }}">
 							<i class="fa-solid fa-pencil"></i>
 						</a>
-						<a class="btn" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette figure ?');" href="{{ path('tricks.delete', {id:figure.id,slug:figure.getSlug()}) }}">
+						<a class="btn" href="{{ path('figure.delete', {id:figure.id,slug:figure.getSlug()}) }}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette figure ?');">
 							<i class="fa-solid fa-trash"></i>
 						</a>
 					</div>
@@ -92,7 +92,7 @@
 				{% set pageSelected = page < lastPage ? page + 1 : false %}
 				{% if pageSelected %}
 					<div class="flex justify-center m-4">
-						<a href="{{ path( 'tricks.show', {id:app.request.attributes.get('id'), slug:app.request.attributes.get('slug'), page:pageSelected} ) }}#discussion-bottom" class="btn btn-secondary !text-white">Charger plus ...</a>
+						<a href="{{ path( 'figure.read', {id:app.request.attributes.get('id'), slug:app.request.attributes.get('slug'), page:pageSelected} ) }}#discussion-bottom" class="btn btn-secondary !text-white">Charger plus ...</a>
 					</div>
 				{% else %}
 					<div class="flex justify-center m-4">

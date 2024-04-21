@@ -3,41 +3,41 @@
 namespace App\Controller;
 
 use App\Entity\Message;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\MessageRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
+#[Route('/mesages', name: 'messages', methods: ['GET', 'POST'])]
 class MesagesController extends AbstractController {
 
     public function __construct(
-        private readonly EntityManagerInterface $em
+        private readonly MessageRepository $messageRepository,
     ) {
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/mesages/delete/{id}', name: 'messages.delete', methods: ['GET'])]
-    public function delete(Message $message, Request $request): Response {
+    #[Route('/{id}/delete', name: '.delete', methods: ['GET'])]
+    public function delete(Request $request, Message $message): RedirectResponse {
         if ($message->getUser() !== $this->getUser()) {
             $this->addFlash('danger', 'Vous ne pouvez pas supprimer ce message !');
         } else {
-            $this->em->remove($message);
-            $this->em->flush();
+            $this->messageRepository->delete($message);
 
             $this->addFlash('success', 'Le message a bien été supprimé !');
         }
+
         return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('home.home'));
     }
 
-    #[Route('/mesages/report/{id}', name: 'messages.report', methods: ['GET'])]
-    public function report(Message $message, Request $request): Response {
-        $message->setReported(true);
-        $this->em->flush();
+    #[Route('/{id}/report', name: '.report', methods: ['GET'])]
+    public function report(Request $request, Message $message): RedirectResponse {
+        $message = $this->messageRepository->report($message);
 
         $this->addFlash('success', 'Le message a bien été signalé !');
 
-        return $this->redirect($request->headers->get('referer'));
+        return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('home.home'));
     }
 }
