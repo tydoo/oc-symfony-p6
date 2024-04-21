@@ -24,6 +24,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
+#[Route(name: 'security', methods: ['GET', 'POST'])]
 class SecurityController extends AbstractController {
     public function __construct(
         private readonly SecurityService $securityService,
@@ -33,7 +34,7 @@ class SecurityController extends AbstractController {
     ) {
     }
 
-    #[Route(path: '/login', name: 'security.login', methods: ['GET', 'POST'])]
+    #[Route(path: '/login', name: '.login', methods: ['GET', 'POST'])]
     public function login(
         Request $request,
         AuthenticationUtils $authenticationUtils
@@ -51,12 +52,12 @@ class SecurityController extends AbstractController {
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route(path: '/logout', name: 'security.logout', methods: ['GET'])]
+    #[Route(path: '/logout', name: '.logout', methods: ['GET'])]
     public function logout(): void {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 
-    #[Route('/register', name: 'security.register', methods: ['GET', 'POST'])]
+    #[Route('/register', name: '.register')]
     public function register(
         Request $request,
         UserPasswordHasherInterface $userPasswordHasher
@@ -90,7 +91,7 @@ class SecurityController extends AbstractController {
         ]);
     }
 
-    #[Route('/verify/email', name: 'security.verify_email', methods: ['GET'])]
+    #[Route('/verify/email', name: '.verify_email', methods: ['GET'])]
     public function verifyUserEmail(
         #[MapQueryParameter] int $id,
         Request $request,
@@ -117,7 +118,7 @@ class SecurityController extends AbstractController {
         return $this->redirectToRoute('home.home');
     }
 
-    #[Route('/forgot-password', name: 'security.forgot_password', methods: ['GET', 'POST'])]
+    #[Route('/forgot-password', name: '.forgot_password')]
     public function forgotPassword(Request $request): Response {
         $this->userIsLoggedIn();
 
@@ -140,7 +141,7 @@ class SecurityController extends AbstractController {
         ]);
     }
 
-    #[Route('/reset-password', name: 'security.reset_password', methods: ['GET', 'POST'])]
+    #[Route('/reset-password', name: '.reset_password')]
     public function resetPassword(
         #[MapQueryParameter] int $id,
         Request $request,
