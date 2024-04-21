@@ -58,5 +58,6 @@ when@prod:
             deprecation:
                 type: stream
                 channels: [deprecation]
+                level: notice
                 path: php://stderr
                 formatter: monolog.formatter.json
