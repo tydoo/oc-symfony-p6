@@ -2,21 +2,24 @@
 
 namespace App\Controller;
 
+use App\Entity\Photo;
 use App\Entity\Figure;
 use App\Form\TricksType;
 use App\Form\CreateMessageType;
+use App\Form\FeaturedPhotoType;
 use Doctrine\ORM\EntityManager;
 use App\Repository\PhotoRepository;
 use App\Repository\FigureRepository;
 use App\Repository\MessageRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Filesystem\Filesystem;
 
 class TricksController extends AbstractController {
 
@@ -123,6 +126,7 @@ class TricksController extends AbstractController {
     ): Response {
         $figure = $this->getFigureFromIdAndSlug($id, $slug);
 
+        //formulaire principal
         $form = $this->createForm(TricksType::class, $figure);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -136,9 +140,40 @@ class TricksController extends AbstractController {
             ]);
         }
 
+        //formulaire d'ajout de photo à la une
+        $featuredPhotoForm = $this->createForm(FeaturedPhotoType::class);
+        $featuredPhotoForm->handleRequest($request);
+        if ($featuredPhotoForm->isSubmitted() && $featuredPhotoForm->isValid()) {
+            $path = str_replace('upload/', '', $figure->getFeaturedPhoto());
+            $featuredPhotoActuel = $this->photoRepository->findOneBy(['path' => $path]);
+            if ($featuredPhotoActuel) {
+                $this->filesystem->remove($this->uploadFQDNDir . DIRECTORY_SEPARATOR . $path);
+                $this->em->remove($featuredPhotoActuel);
+            }
+
+            /** @var UploadedFile $featuredPhotoNew */
+            $featuredPhotoNew = $featuredPhotoForm->getData()['photo'];
+            $name = 'tricks-' . bin2hex(random_bytes(16)) . '.jpg';
+            $featuredPhotoNew->move($this->uploadFQDNDir, $name);
+            $this->em->persist((new Photo())
+                    ->setPath($name)
+                    ->setFigure($figure)
+                    ->setFeatured(true)
+            );
+            $this->em->flush();
+
+            $this->addFlash('success', 'L\'image à la une a bien été modifiée !');
+
+            return $this->redirectToRoute('tricks.edit', [
+                'id' => $figure->getId(),
+                'slug' => $figure->getSlug(),
+            ]);
+        }
+
         return $this->render('tricks/edit.html.twig', [
             'figure' => $figure,
             'tricksForm' => $form,
+            'featuredPhotoForm' => $featuredPhotoForm,
         ]);
     }
 
@@ -148,10 +183,7 @@ class TricksController extends AbstractController {
         name: 'tricks.delete_featured_image',
         methods: ['GET']
     )]
-    public function deleteFeaturedImage(
-        int $id,
-        string $slug
-    ): Response {
+    public function deleteFeaturedImage(int $id, string $slug): Response {
         $figure = $this->getFigureFromIdAndSlug($id, $slug);
 
         $path = str_replace('upload/', '', $figure->getFeaturedPhoto());

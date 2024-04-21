@@ -13,54 +13,52 @@
 					<p class="text-7xl text-center font-bold pb-8 text-white">{{ figure.name ?? 'Nouveau tricks' }}</p>
 				</div>
 				{% if figure.id %}
-					<div class="border absolute top-2 right-2 p-1 bg-white/70 rounded-sm">
-						<a class="btn" href="#">
-							<i class="fa-solid fa-pencil"></i>
-						</a>
-						{% if figure.haveFeaturedPhoto() %}
-							<a class="btn" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette image à la une ?');" href="{{ path('tricks.delete_featured_image', {id:figure.id,slug:figure.getSlug()}) }}">
-								<i class="fa-solid fa-trash"></i>
-							</a>
-						{% endif %}
-					</div>
-				{% endif %}
-			</div>
-			{% if figure.id %}
-				<div id="medias" class="my-3 mx-4 hidden md:flex space-x-2 overflow-x-auto">
-					<button class="btn btn-primary mt-[2px] mb-3 !px-[60px]">Ajouter une photo</button>
-					{% for photo in figure.photos %}
-						<div>
-							<a class="hover:!border-neutral-700 border-transparent border-2 w-[150px] flex justify-center items-stretch h-28 bg-center bg-cover bg-no-repeat flex-shrink-0 flex-none" target="_blanck" style="background-image:url({{ asset('upload/' ~ photo.path) }});" href="{{ asset('upload/' ~ photo.path) }}"></a>
-							<div class="my-2 flex justify-end items-center">
-								<div class="flex border p-1">
-									<a class="btn" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette photo ?');" href="{{ path('tricks.delete_photo', {path:photo.path}) }}">
-										<i class="fa-solid fa-trash fa-sm"></i>
-									</a>
+					<div class="border absolute flex gap-1 top-2 right-2 p-1 bg-white/70 rounded-sm">
+						{{ form(featuredPhotoForm) }}
+							{% if figure.haveFeaturedPhoto() %}
+								<a class="btn" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette image à la une ?');" href="{{ path('tricks.delete_featured_image', {id:figure.id,slug:figure.getSlug()}) }}">
+									<i class="fa-solid fa-trash"></i>
+								</a>
+							{% endif %}
+						</div>
+					{% endif %}
+				</div>
+				{% if figure.id %}
+					<div id="medias" class="my-3 mx-4 hidden md:flex space-x-2 overflow-x-auto">
+						<button class="btn btn-primary mt-[2px] mb-3 !px-[60px]">Ajouter une photo</button>
+						{% for photo in figure.photos %}
+							<div>
+								<a class="hover:!border-neutral-700 border-transparent border-2 w-[150px] flex justify-center items-stretch h-28 bg-center bg-cover bg-no-repeat flex-shrink-0 flex-none" target="_blanck" style="background-image:url({{ asset('upload/' ~ photo.path) }});" href="{{ asset('upload/' ~ photo.path) }}"></a>
+								<div class="my-2 flex justify-end items-center">
+									<div class="flex border p-1">
+										<a class="btn" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette photo ?');" href="{{ path('tricks.delete_photo', {path:photo.path}) }}">
+											<i class="fa-solid fa-trash fa-sm"></i>
+										</a>
+									</div>
 								</div>
 							</div>
-						</div>
-					{% endfor %}
-					{% for video in figure.videos %}
-						<iframe class="mt-[2px] flex-shrink-0 flex-none" width="150" height="108" src="{{ video.path }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-					{% endfor %}
+						{% endfor %}
+						{% for video in figure.videos %}
+							<iframe class="mt-[2px] flex-shrink-0 flex-none" width="150" height="108" src="{{ video.path }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+						{% endfor %}
+					</div>
+					<div class="my-3 mx-4 md:hidden flex justify-center items-center">
+						<button id="showMedia" class="btn btn-primary">Voir les médias</button>
+					</div>
+				{% endif %}
+				<div class="my-12 mx-4 md:px-48">
+					{{ form_start(tricksForm)}}
+					{{form_row(tricksForm.name)}}
+					{{form_row(tricksForm.description)}}
+					{{form_row(tricksForm.category)}}
+					<div class="flex justify-center gap-6 mt-10 md:justify-end">
+						{% if figure.id %}
+							<a onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette figure ?');" href="{{ path('tricks.delete', {id:figure.id,slug:figure.getSlug()}) }}" class="btn text-white btn-danger btn-primary">Supprimer</a>
+						{% endif %}
+						{{form_row(tricksForm.submit)}}
+					</div>
+					{{ form_end(tricksForm)}}
 				</div>
-				<div class="my-3 mx-4 md:hidden flex justify-center items-center">
-					<button id="showMedia" class="btn btn-primary">Voir les médias</button>
-				</div>
-			{% endif %}
-			<div class="my-12 mx-4 md:px-48">
-				{{ form_start(tricksForm)}}
-				{{form_row(tricksForm.name)}}
-				{{form_row(tricksForm.description)}}
-				{{form_row(tricksForm.category)}}
-				<div class="flex justify-center gap-6 mt-10 md:justify-end">
-					{% if figure.id %}
-						<a onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette figure ?');" href="{{ path('tricks.delete', {id:figure.id,slug:figure.getSlug()}) }}" class="btn text-white btn-danger btn-primary">Supprimer</a>
-					{% endif %}
-					{{form_row(tricksForm.submit)}}
-				</div>
-				{{ form_end(tricksForm)}}
 			</div>
 		</div>
-	</div>
-{% endblock %}
+	{% endblock %}
