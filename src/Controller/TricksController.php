@@ -6,6 +6,7 @@ use App\Entity\Figure;
 use App\Form\TricksType;
 use App\Form\CreateMessageType;
 use Doctrine\ORM\EntityManager;
+use App\Repository\PhotoRepository;
 use App\Repository\FigureRepository;
 use App\Repository\MessageRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,13 +16,20 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 
 class TricksController extends AbstractController {
 
+    private readonly string $uploadFQDNDir;
+
     public function __construct(
+        private readonly string $projectDir,
+        private readonly string $uploadDir,
         private readonly EntityManagerInterface $em,
-        private readonly FigureRepository $figureRepository
+        private readonly FigureRepository $figureRepository,
+        private readonly Filesystem $filesystem
     ) {
+        $this->uploadFQDNDir = $this->projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . $this->uploadDir;
     }
 
     #[Route(
@@ -37,10 +45,7 @@ class TricksController extends AbstractController {
         MessageRepository $messageRepository,
         Request $request
     ): Response {
-        $figure = $this->figureRepository->find($id);
-        if (!$figure || $figure->getSlug() !== $slug) {
-            throw $this->createNotFoundException('Aucune figure trouvé !');
-        }
+        $figure = $this->getFigureFromIdAndSlug($id, $slug);
 
         $form = $this->createForm(CreateMessageType::class);
         $form->handleRequest($request);
@@ -89,9 +94,10 @@ class TricksController extends AbstractController {
         int $id,
         string $slug
     ): Response {
-        $figure = $this->figureRepository->find($id);
-        if (!$figure || $figure->getSlug() !== $slug) {
-            throw $this->createNotFoundException('Aucune figure trouvé !');
+        $figure = $this->getFigureFromIdAndSlug($id, $slug);
+
+        foreach ($figure->getPhotos() as $photo) {
+            $this->filesystem->remove($this->uploadFQDNDir . DIRECTORY_SEPARATOR . $photo->getPath());
         }
 
         $this->em->remove($figure);
@@ -114,10 +120,7 @@ class TricksController extends AbstractController {
         string $slug,
         Request $request
     ): Response {
-        $figure = $this->figureRepository->find($id);
-        if (!$figure || $figure->getSlug() !== $slug) {
-            throw $this->createNotFoundException('Aucune figure trouvé !');
-        }
+        $figure = $this->getFigureFromIdAndSlug($id, $slug);
 
         $form = $this->createForm(TricksType::class, $figure);
         $form->handleRequest($request);
@@ -140,12 +143,43 @@ class TricksController extends AbstractController {
 
     #[IsGranted('ROLE_USER')]
     #[Route(
+        path: '/tricks/{id}-{slug}/delete-featured-image',
+        name: 'tricks.delete_featured_image',
+        methods: ['GET']
+    )]
+    public function deleteFeaturedImage(
+        PhotoRepository $photoRepository,
+        int $id,
+        string $slug
+    ): Response {
+        $figure = $this->getFigureFromIdAndSlug($id, $slug);
+
+        $path = str_replace('upload/', '', $figure->getFeaturedPhoto());
+        $photo = $photoRepository->findOneBy(['path' => $path]);
+        if (!$photo) {
+            throw $this->createNotFoundException('Aucune image trouvée !');
+        }
+
+        $this->em->remove($photo);
+        $this->em->flush();
+
+        $this->filesystem->remove($this->uploadFQDNDir . DIRECTORY_SEPARATOR . $path);
+
+        $this->addFlash('success', 'L\'image à la une a bien été supprimée !');
+
+        return $this->redirectToRoute('tricks.edit', [
+            'id' => $figure->getId(),
+            'slug' => $figure->getSlug(),
+        ]);
+    }
+
+    #[IsGranted('ROLE_USER')]
+    #[Route(
         path: '/tricks/new',
         name: 'tricks.create',
         methods: ['GET', 'POST']
     )]
     public function create(Request $request): Response {
-
         $figure = new Figure();
         $form = $this->createForm(TricksType::class, $figure);
         $form->handleRequest($request);
@@ -155,9 +189,9 @@ class TricksController extends AbstractController {
             $this->em->persist($figure);
             $this->em->flush();
 
-            $this->addFlash('success', 'La figure a bien été créée !');
+            $this->addFlash('success', 'La figure a bien été créée ! Vous pouvez maintenant ajouter des images et des vidéos.');
 
-            return $this->redirectToRoute('tricks.show', [
+            return $this->redirectToRoute('tricks.edit', [
                 'id' => $figure->getId(),
                 'slug' => $figure->getSlug(),
             ]);
@@ -167,5 +201,14 @@ class TricksController extends AbstractController {
             'figure' => $figure,
             'tricksForm' => $form,
         ]);
+    }
+
+    private function getFigureFromIdAndSlug(int $id, string $slug): Figure {
+        $figure = $this->figureRepository->find($id);
+        if (!$figure || $figure->getSlug() !== $slug) {
+            throw $this->createNotFoundException('Aucune figure trouvé !');
+        }
+
+        return $figure;
     }
 }

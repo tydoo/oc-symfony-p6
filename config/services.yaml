@@ -26,4 +26,9 @@ services:
     App\DataFixtures\AppFixtures:
         arguments:
             - "%kernel.project_dir%"
-            - "%kernel.project_dir%%env(UPLOAD_DIR)%"
+            - "%env(UPLOAD_DIR)%"
+
+    App\Controller\TricksController:
+        arguments:
+            - "%kernel.project_dir%"
+            - "%env(UPLOAD_DIR)%"

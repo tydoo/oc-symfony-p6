@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
-use App\Repository\PhotoRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\PhotoRepository;
 
 #[ORM\Entity(repositoryClass: PhotoRepository::class)]
 class Photo {
@@ -20,7 +20,7 @@ class Photo {
     private ?Figure $figure = null;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
-    private ?bool $featured = null;
+    private ?bool $featured = false;
 
     public function getId(): ?int {
         return $this->id;

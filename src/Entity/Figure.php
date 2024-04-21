@@ -6,7 +6,6 @@ use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\FigureRepository;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Filesystem\Filesystem;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -165,12 +164,6 @@ class Figure {
     public function getSlug(): string {
         $slugger = new AsciiSlugger();
         return $slugger->slug($this->name)->lower();
-    }
-
-    #[ORM\PreRemove]
-    public function onPreRemove(): void {
-        $fileSystem = new Filesystem();
-        $fileSystem->remove($_ENV['UPLOAD_DIR'] . $this->getName());
     }
 
     /**
