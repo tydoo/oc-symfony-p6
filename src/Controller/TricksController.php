@@ -2,18 +2,19 @@
 
 namespace App\Controller;
 
-use App\Form\CreateMessageType;
+use App\Entity\Figure;
 use App\Form\TricksType;
+use App\Form\CreateMessageType;
+use Doctrine\ORM\EntityManager;
 use App\Repository\FigureRepository;
 use App\Repository\MessageRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class TricksController extends AbstractController {
 
@@ -121,9 +122,18 @@ class TricksController extends AbstractController {
         $form = $this->createForm(TricksType::class, $figure);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->em->flush();
+
+            $this->addFlash('success', 'La figure a bien été modifiée !');
+
+            return $this->redirectToRoute('tricks.show', [
+                'id' => $figure->getId(),
+                'slug' => $figure->getSlug(),
+            ]);
         }
 
         return $this->render('tricks/edit.html.twig', [
+            'figure' => $figure,
             'tricksForm' => $form,
         ]);
     }
@@ -134,7 +144,28 @@ class TricksController extends AbstractController {
         name: 'tricks.create',
         methods: ['GET', 'POST']
     )]
-    public function create(): Response {
-        return $this->render('tricks/edit.html.twig', []);
+    public function create(Request $request): Response {
+
+        $figure = new Figure();
+        $form = $this->createForm(TricksType::class, $figure);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $figure->setCreatedBy($this->getUser());
+            $figure->setUpdatedBy($this->getUser());
+            $this->em->persist($figure);
+            $this->em->flush();
+
+            $this->addFlash('success', 'La figure a bien été créée !');
+
+            return $this->redirectToRoute('tricks.show', [
+                'id' => $figure->getId(),
+                'slug' => $figure->getSlug(),
+            ]);
+        }
+
+        return $this->render('tricks/edit.html.twig', [
+            'figure' => $figure,
+            'tricksForm' => $form,
+        ]);
     }
 }

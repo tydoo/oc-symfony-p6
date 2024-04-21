@@ -1,8 +1,60 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello TricksController!
+{% block title %}
+	{{ figure.name }}
 {% endblock %}
 
 {% block body %}
-	page add/edit
+	<div id="hero" class="flex items-start justify-center relative">
+		<div class="bg-cover blur-lg absolute top-0 right-0 left-0 bg-center h-[700px] w-full" style="background-image:url({{ asset('images/snow.jpg') }})"></div>
+		<div class="rounded-sm z-10 bg-white border-1 border-neutral-700 md:!mt-24 block w-full md:w-[992px]" style="margin:0.75rem;">
+			<div class="relative h-[400px] bg-center bg-cover" style="background-image:url({{ asset(figure.getFeaturedPhoto()) }});">
+				<div class="flex flex-col justify-center items-center h-full">
+					<p class="text-7xl font-bold pb-8 text-white">{{ figure.id ? figure.name : 'Nouveau tricks' }}</p>
+				</div>
+				{% if figure.id %}
+					<div class="border absolute top-2 right-2 p-1 bg-white/70 rounded-sm">
+						<a class="btn" href="#">
+							<i class="fa-solid fa-pencil"></i>
+						</a>
+						{% if figure.haveFeaturedPhoto() %}
+							<a class="btn" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette photo ?');" href="#">
+								<i class="fa-solid fa-trash"></i>
+							</a>
+						{% endif %}
+					</div>
+				{% endif %}
+			</div>
+			{% if figure.id %}
+				<div id="medias" class="my-3 mx-4 hidden md:flex space-x-2 overflow-x-auto">
+					{% for photo in figure.photos %}
+						<a class="hover:!border-neutral-700 border-transparent border-2 w-[150px] flex justify-center items-stretch h-28 bg-center bg-cover bg-no-repeat flex-shrink-0 flex-none" target="_blanck" style="background-image:url({{ asset('upload/' ~ photo.path) }});" href="{{ asset('upload/' ~ photo.path) }}"></a>
+					{% endfor %}
+					{% for video in figure.videos %}
+						<iframe class="mt-[2px] flex-shrink-0 flex-none" width="150" height="108" src="{{ video.path }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+					{% endfor %}
+
+					{% if figure.photos|length == 0 and figure.videos|length == 0 %}
+						<p class=" text-base font-medium">Aucun média présent sur cette fiche.</p>
+					{% endif %}
+				</div>
+				<div class="my-3 mx-4 md:hidden flex justify-center items-center">
+					<button id="showMedia" class="btn btn-primary">Voir les médias</button>
+				</div>
+			{% endif %}
+			<div class="my-12 mx-4 md:px-48">
+				{{ form_start(tricksForm)}}
+				{{form_row(tricksForm.name)}}
+				{{form_row(tricksForm.description)}}
+				{{form_row(tricksForm.category)}}
+				<div class="flex justify-center gap-6 mt-10 md:justify-end">
+					{% if figure.id %}
+						<a onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette figure ?');" href="{{ path('tricks.delete', {id:figure.id,slug:figure.getSlug()}) }}" class="btn text-white btn-danger btn-primary">Supprimer</a>
+					{% endif %}
+					{{form_row(tricksForm.submit)}}
+				</div>
+				{{ form_end(tricksForm)}}
+			</div>
+		</div>
+	</div>
 {% endblock %}

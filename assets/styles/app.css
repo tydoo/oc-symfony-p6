@@ -27,7 +27,7 @@ a {
 
 
 .card,
-button {
+.btn {
     @apply !rounded-sm;
 }
 

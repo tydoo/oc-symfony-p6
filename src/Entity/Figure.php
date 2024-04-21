@@ -245,4 +245,8 @@ class Figure {
         }
         return $featuredPhoto;
     }
+
+    public function haveFeaturedPhoto(): bool {
+        return $this->getFeaturedPhoto() !== 'tricks-default.jpg';
+    }
 }
