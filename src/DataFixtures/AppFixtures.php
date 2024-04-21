@@ -19,14 +19,18 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture {
 
+    private readonly string $uploadFQDNDir;
+
     public function __construct(
         private readonly string $projectDir,
         private readonly string $uploadDir,
         private readonly Filesystem $filesystem,
         private readonly UserPasswordHasherInterface $passwordHasher
     ) {
+        $this->uploadFQDNDir = $this->projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . $this->uploadDir;
+
         $finder = new Finder();
-        foreach ($finder->files()->in($this->uploadDir) as $file) {
+        foreach ($finder->files()->in($this->uploadFQDNDir) as $file) {
             $this->filesystem->remove($file->getRealPath());
         }
     }
@@ -51,8 +55,7 @@ class AppFixtures extends Fixture {
             ->setEmail('thomas@tydoo.fr')
             ->setVerified(1);
         $name = 'tydoo-' . bin2hex(random_bytes(16)) . '.jpg';
-        $url = $this->uploadDir . DIRECTORY_SEPARATOR . $name;
-        $this->filesystem->dumpFile($url, file_get_contents('https://avatar.iran.liara.run/public/boy?username=' . urlencode($user->getUsername())));
+        $this->filesystem->dumpFile($this->uploadFQDNDir . DIRECTORY_SEPARATOR . $name, file_get_contents('https://avatar.iran.liara.run/public/boy?username=' . urlencode($user->getUsername())));
         $user->setPhoto($name);
         $manager->persist($user->setPassword($this->passwordHasher->hashPassword($user, '112233')));
     }
@@ -73,7 +76,7 @@ class AppFixtures extends Fixture {
 
             if ($photo) {
                 $name = 'avatar-' . bin2hex(random_bytes(16)) . '.jpg';
-                $this->filesystem->dumpFile($this->uploadDir . DIRECTORY_SEPARATOR . $name, file_get_contents($photo));
+                $this->filesystem->dumpFile($this->uploadFQDNDir . DIRECTORY_SEPARATOR . $name, file_get_contents($photo));
                 $user->setPhoto($name);
             }
 
@@ -172,7 +175,7 @@ class AppFixtures extends Fixture {
 
             if (!isset($figure['image'])) {
                 $name = 'tricks-' . bin2hex(random_bytes(16)) . '.jpg';
-                $this->filesystem->dumpFile($this->uploadDir . DIRECTORY_SEPARATOR . $name, file_get_contents($this->projectDir . DIRECTORY_SEPARATOR . 'images_tricks' . DIRECTORY_SEPARATOR . str_replace(' ', '', strtolower($figure['name'])) . '.jpg'));
+                $this->filesystem->dumpFile($this->uploadFQDNDir . DIRECTORY_SEPARATOR . $name, file_get_contents($this->projectDir . DIRECTORY_SEPARATOR . 'images_tricks' . DIRECTORY_SEPARATOR . str_replace(' ', '', strtolower($figure['name'])) . '.jpg'));
                 $figureObject->addPhoto((new Photo())
                         ->setPath($name)
                         ->setFeatured(true)
