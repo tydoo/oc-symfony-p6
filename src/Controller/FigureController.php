@@ -2,16 +2,18 @@
 
 namespace App\Controller;
 
+use App\Entity\Video;
 use App\Entity\Figure;
 use App\Entity\Message;
 use App\Form\PhotoType;
+use App\Form\VideoType;
 use App\Form\TricksType;
 use App\Form\CreateMessageType;
 use App\Form\FeaturedPhotoType;
 use App\Repository\PhotoRepository;
+use App\Repository\VideoRepository;
 use App\Repository\FigureRepository;
 use App\Repository\MessageRepository;
-use App\Repository\VideoRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -152,6 +154,24 @@ class FigureController extends AbstractController {
             ]);
         }
 
+        //Formulaire d'ajout de vidéo
+        $video = new Video();
+        $videoForm = $this->createForm(VideoType::class, $video);
+        $videoForm->handleRequest($request);
+        if ($videoForm->isSubmitted() && $videoForm->isValid()) {
+            $video = $videoRepository->add(
+                video: $video,
+                figure: $figure
+            );
+
+            $this->addFlash('success', 'La vidéo a bien été ajoutée !');
+
+            return $this->redirectToRoute('figure.update', [
+                'id' => $figure->getId(),
+                'slug' => $figure->getSlug(),
+            ]);
+        }
+
         return $this->render('figure/create-update.html.twig', [
             'figure' => $figure,
             'photos' => $photoRepository->getPhotosFromFigure($figure),
@@ -159,6 +179,7 @@ class FigureController extends AbstractController {
             'tricksForm' => $form,
             'featuredPhotoForm' => $featuredPhotoForm,
             'photoForm' => $photoForm,
+            'videoForm' => $videoForm,
         ]);
     }
 

@@ -25,9 +25,13 @@
 				</div>
 				{% if figure.id %}
 					<div id="medias" class="my-3 mx-4 hidden md:flex space-x-2 overflow-x-auto">
-						<div class="flex flex-col h-[252px] w-[150px]">
+						<div class="flex flex-col items-stretch w-[150px] gap-1">
 							{{ form(photoForm)}}
+								<button id="showVideoForm" class="btn btn-primary w-full !py-4">Ajouter une vidéo</button>
 							</div>
+							{{ form_start(videoForm, {attr:{class: (videoForm.vars.valid ? 'hidden' : '') ~ ' p-3 bg-neutral-200 rounded relative'}})}}
+							<button id="closeVideoForm" type="button" class="delete absolute top-2 right-2"></button>
+							{{ form_end(videoForm)}}
 							{% for photo in photos %}
 								<div>
 									<a class="hover:!border-neutral-700 border-transparent border-2 w-[150px] flex justify-center items-stretch h-28 bg-center bg-cover bg-no-repeat flex-shrink-0 flex-none" target="_blanck" style="background-image:url({{ asset('upload/' ~ photo.path) }});" href="{{ asset('upload/' ~ photo.path) }}"></a>
@@ -42,7 +46,9 @@
 							{% endfor %}
 							{% for video in figure.videos %}
 								<div>
-									<iframe class="mt-[2px] flex-shrink-0 flex-none" width="150" height="108" src="{{ video.path }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+									<div class="diviframe w-[150px] object-cover overflow-hidden h-[108px] mt-[2px] flex-shrink-0 flex-none">
+										{{ video.path|raw  }}
+									</div>
 									<div class="my-2 flex justify-end items-center">
 										<div class="flex border p-1">
 											<a class="btn" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette vidéo ?');" href="{{ path('videos.delete', {id:video.id}) }}">

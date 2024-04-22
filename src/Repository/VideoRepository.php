@@ -34,4 +34,14 @@ class VideoRepository extends ServiceEntityRepository {
 
         return $qb->getQuery()->getResult();
     }
+
+    public function add(Video $video, Figure $figure): Video {
+        $video->setPath(htmlentities(str_replace('autoplay', '', $video->getPath())));
+
+        $video->setFigure($figure);
+        $this->_em->persist($video);
+        $this->_em->flush();
+
+        return $video;
+    }
 }

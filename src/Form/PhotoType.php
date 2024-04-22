@@ -14,7 +14,7 @@ class PhotoType extends AbstractType {
             ->add('photo', FileType::class, [
                 'label' => "Ajouter une photo",
                 'label_attr' => [
-                    'class' => 'mb-0 btn btn-primary w-full',
+                    'class' => 'mb-0 btn btn-primary w-full !py-4',
                 ],
                 'row_attr' => [
                     'class' => 'mb-0',

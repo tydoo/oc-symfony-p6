@@ -107,35 +107,37 @@ class AppFixtures extends Fixture {
                 'name' => 'Mute',
                 'description' => 'Saisie de la carre frontside de la planche entre les deux pieds avec la main avant',
                 'category' => 'Grabs',
-                'video' => 'https://www.youtube.com/embed/NnnsXEBwTHc'
+                'video' => '<iframe width="560" height="315" src="https://www.youtube.com/embed/NnnsXEBwTHc?si=HFjOFKL0IY8NlTgv" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'
             ],
             [
                 'name' => 'Sad',
                 'description' => 'Saisie de la carre backside de la planche, entre les deux pieds, avec la main avant',
                 'category' => 'Grabs',
-                'video' => 'https://www.youtube.com/embed/KEdFwJ4SWq4'
+                'video' => '<iframe width="560" height="315" src="https://www.youtube.com/embed/KEdFwJ4SWq4?si=BlJEqY3JucVQk_nY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'
             ],
             [
                 'name' => 'Indy',
                 'description' => 'Saisie de la carre frontside de la planche, entre les deux pieds, avec la main arrière',
                 'category' => 'Grabs',
-                'video' => 'https://www.youtube.com/embed/6yA3XqjTh_w'
+                'video' => '<iframe width="560" height="315" src="https://www.youtube.com/embed/6yA3XqjTh_w?si=ywWFMlVw6b3vOrDx" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'
             ],
             [
                 'name' => '180',
                 'description' => 'Demie-rotation horizontale',
                 'category' => 'Rotations',
-                'video' => 'https://www.youtube.com/embed/2IqJcdFQiXk'
+                'video' => '<iframe width="560" height="315" src="https://www.youtube.com/embed/2IqJcdFQiXk?si=jc-U_9C0PTD0u4v1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'
             ],
             [
                 'name' => '360',
                 'description' => 'Rotation horizontale complète',
-                'category' => 'Rotations'
+                'category' => 'Rotations',
+                'video' => '<iframe width="560" height="315" src="https://www.youtube.com/embed/XKoj-e52w30?si=TKC8dIvmv3kgS97B" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'
             ],
             [
                 'name' => 'Back flip',
                 'description' => 'Rotation verticale en arrière',
-                'category' => 'Flips'
+                'category' => 'Flips',
+                'video' => '<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;"> <iframe style="width:100%;height:100%;position:absolute;left:0px;top:0px;overflow:hidden" frameborder="0" type="text/html" src="https://www.dailymotion.com/embed/video/xyxdbf?autoplay=1" width="100%" height="100%" allowfullscreen title="Dailymotion Video Player" allow="autoplay"> </iframe> </div>'
             ],
             [
                 'name' => 'Front flip',
@@ -183,7 +185,7 @@ class AppFixtures extends Fixture {
 
             if (isset($figure['video'])) {
                 $figureObject->addVideo((new Video())
-                    ->setPath($figure['video']));
+                    ->setPath(htmlentities(str_replace('autoplay', '', $figure['video']))));
             }
 
             $manager->persist($figureObject);

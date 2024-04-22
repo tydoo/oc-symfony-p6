@@ -28,7 +28,9 @@
 					<a class="hover:!border-neutral-700 border-transparent border-2 w-[150px] flex justify-center items-stretch h-28 bg-center bg-cover bg-no-repeat flex-shrink-0 flex-none" target="_blanck" style="background-image:url({{ asset('upload/' ~ photo.path) }});" href="{{ asset('upload/' ~ photo.path) }}"></a>
 				{% endfor %}
 				{% for video in figure.videos %}
-					<iframe class="mt-[2px] flex-shrink-0 flex-none" width="150" height="108" src="{{ video.path }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+					<div class="diviframe w-[150px] mt-[2px] object-cover overflow-hidden h-[108px] flex-shrink-0 flex-none">
+						{{ video.path|raw }}
+					</div>
 				{% endfor %}
 
 				{% if figure.photos|length == 0 and figure.videos|length == 0 %}
