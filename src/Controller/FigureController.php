@@ -4,19 +4,21 @@ namespace App\Controller;
 
 use App\Entity\Figure;
 use App\Entity\Message;
+use App\Form\PhotoType;
 use App\Form\TricksType;
 use App\Form\CreateMessageType;
 use App\Form\FeaturedPhotoType;
 use App\Repository\PhotoRepository;
 use App\Repository\FigureRepository;
 use App\Repository\MessageRepository;
+use App\Repository\VideoRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 #[Route(path: '/figure', name: 'figure', methods: ['GET', 'POST'])]
 class FigureController extends AbstractController {
@@ -24,7 +26,6 @@ class FigureController extends AbstractController {
 
     public function __construct(
         private readonly FigureRepository $figureRepository,
-        private readonly PhotoRepository $photoRepository,
     ) {
     }
 
@@ -96,7 +97,9 @@ class FigureController extends AbstractController {
     public function update(
         int $id,
         string $slug,
-        Request $request
+        Request $request,
+        PhotoRepository $photoRepository,
+        VideoRepository $videoRepository
     ): Response {
         $figure = $this->figureRepository->getFigureFromIdAndSlug($id, $slug);
 
@@ -118,8 +121,8 @@ class FigureController extends AbstractController {
         $featuredPhotoForm = $this->createForm(FeaturedPhotoType::class);
         $featuredPhotoForm->handleRequest($request);
         if ($featuredPhotoForm->isSubmitted() && $featuredPhotoForm->isValid()) {
-            $this->photoRepository->add(
-                featuredPhotoNew: $featuredPhotoForm->getData()['photo'],
+            $photoRepository->add(
+                photo: $featuredPhotoForm->get('photo')->getData(),
                 figure: $figure,
                 isFeatured: true
             );
@@ -132,10 +135,30 @@ class FigureController extends AbstractController {
             ]);
         }
 
+        //formulaire d'ajout de photo
+        $photoForm = $this->createForm(PhotoType::class);
+        $photoForm->handleRequest($request);
+        if ($photoForm->isSubmitted() && $photoForm->isValid()) {
+            $photoRepository->add(
+                photo: $photoForm->get('photo')->getData(),
+                figure: $figure
+            );
+
+            $this->addFlash('success', 'La photo a bien été ajoutée !');
+
+            return $this->redirectToRoute('figure.update', [
+                'id' => $figure->getId(),
+                'slug' => $figure->getSlug(),
+            ]);
+        }
+
         return $this->render('figure/create-update.html.twig', [
             'figure' => $figure,
+            'photos' => $photoRepository->getPhotosFromFigure($figure),
+            'videos' => $videoRepository->getVideosFromFigure($figure),
             'tricksForm' => $form,
             'featuredPhotoForm' => $featuredPhotoForm,
+            'photoForm' => $photoForm,
         ]);
     }
 

@@ -3,8 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Video;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Entity\Figure;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Video>
@@ -22,5 +23,15 @@ class VideoRepository extends ServiceEntityRepository {
     public function delete(Video $video): void {
         $this->_em->remove($video);
         $this->_em->flush();
+    }
+
+    public function getVideosFromFigure(Figure $figure): array {
+        $qb = $this->createQueryBuilder('v');
+
+        $qb->where('v.figure = :figure')
+            ->setParameter('figure', $figure)
+            ->orderBy('v.id', 'DESC');
+
+        return $qb->getQuery()->getResult();
     }
 }

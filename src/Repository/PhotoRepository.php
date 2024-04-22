@@ -36,22 +36,34 @@ class PhotoRepository extends ServiceEntityRepository {
         $this->_em->flush();
     }
 
-    public function add(UploadedFile $featuredPhotoNew, Figure $figure, bool $isFeatured = false): Photo {
-        $featuredPhotoActuel = $this->findOneBy(['path' => $figure->getFeaturedPhoto()]);
-        if ($featuredPhotoActuel) {
-            $this->delete($featuredPhotoActuel);
+    public function add(UploadedFile $photo, Figure $figure, bool $isFeatured = false): Photo {
+        if ($isFeatured) {
+            $featuredPhotoActuel = $this->findOneBy(['path' => $figure->getFeaturedPhoto()]);
+            if ($featuredPhotoActuel && $figure->haveFeaturedPhoto()) {
+                $this->delete($featuredPhotoActuel);
+            }
         }
 
-        $name = 'tricks-' . bin2hex(random_bytes(16)) . '.' . $featuredPhotoNew->guessExtension();
-        $featuredPhotoNew->move($this->uploadFQDNDir, $name);
+        $name = 'tricks-' . bin2hex(random_bytes(16)) . '.' . $photo->guessExtension();
+        $photo->move($this->uploadFQDNDir, $name);
         $photo = (new Photo())
             ->setPath($name)
             ->setFigure($figure)
-            ->setFeatured(true);
+            ->setFeatured($isFeatured);
 
         $this->_em->persist($photo);
         $this->_em->flush();
 
         return $photo;
+    }
+
+    public function getPhotosFromFigure(Figure $figure): array {
+        $qb = $this->createQueryBuilder('p');
+
+        $qb->where('p.figure = :figure')
+            ->setParameter('figure', $figure)
+            ->orderBy('p.id', 'DESC');
+
+        return $qb->getQuery()->getResult();
     }
 }

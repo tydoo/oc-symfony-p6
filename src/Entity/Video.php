@@ -6,8 +6,7 @@ use App\Repository\VideoRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: VideoRepository::class)]
-class Video
-{
+class Video {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -18,33 +17,28 @@ class Video
 
     #[ORM\ManyToOne(inversedBy: 'videos')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Figure $Figure = null;
+    private ?Figure $figure = null;
 
-    public function getId(): ?int
-    {
+    public function getId(): ?int {
         return $this->id;
     }
 
-    public function getPath(): ?string
-    {
+    public function getPath(): ?string {
         return $this->path;
     }
 
-    public function setPath(string $path): static
-    {
+    public function setPath(string $path): static {
         $this->path = $path;
 
         return $this;
     }
 
-    public function getFigure(): ?Figure
-    {
-        return $this->Figure;
+    public function getFigure(): ?Figure {
+        return $this->figure;
     }
 
-    public function setFigure(?Figure $Figure): static
-    {
-        $this->Figure = $Figure;
+    public function setFigure(?Figure $figure): static {
+        $this->figure = $figure;
 
         return $this;
     }

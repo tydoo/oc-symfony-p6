@@ -58,7 +58,7 @@ class Figure {
      * @var Collection<int, Video>
      */
     #[ORM\OneToMany(
-        mappedBy: 'Figure',
+        mappedBy: 'figure',
         targetEntity: Video::class,
         orphanRemoval: true,
         cascade: ['persist', 'remove']
@@ -234,5 +234,17 @@ class Figure {
         }
 
         return $featuredPhoto;
+    }
+
+    public function haveFeaturedPhoto(): bool {
+        $featuredPhoto = null;
+        foreach ($this->photos as $photo) {
+            if ($photo->isFeatured()) {
+                $featuredPhoto = $photo->getPath();
+                break;
+            }
+        }
+
+        return $featuredPhoto !== null;
     }
 }

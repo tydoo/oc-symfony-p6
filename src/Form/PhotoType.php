@@ -8,14 +8,13 @@ use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 
-class FeaturedPhotoType extends AbstractType {
+class PhotoType extends AbstractType {
     public function buildForm(FormBuilderInterface $builder, array $options): void {
         $builder
             ->add('photo', FileType::class, [
-                'label' => "<i class='fa-solid fa-pencil'></i>",
-                'label_html' => true,
+                'label' => "Ajouter une photo",
                 'label_attr' => [
-                    'class' => 'btn mb-0',
+                    'class' => 'mb-0 btn btn-primary w-full',
                 ],
                 'row_attr' => [
                     'class' => 'mb-0',
@@ -23,7 +22,7 @@ class FeaturedPhotoType extends AbstractType {
                 'attr' => [
                     'accept' => 'image/jpeg, image/png, image/gif, image/webp',
                     'class' => '!hidden',
-                    'onchange' => 'document.getElementById("featured-photo-form").submit();',
+                    'onchange' => 'document.getElementById("photo-form").submit();',
                 ],
                 'constraints' => [
                     new Image([
@@ -39,7 +38,7 @@ class FeaturedPhotoType extends AbstractType {
     public function configureOptions(OptionsResolver $resolver): void {
         $resolver->setDefaults([
             'attr' => [
-                'id' => 'featured-photo-form',
+                'id' => 'photo-form',
             ],
         ]);
     }
