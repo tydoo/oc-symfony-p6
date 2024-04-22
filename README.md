@@ -35,7 +35,7 @@ symfony serve -d
 ### Utilisateurs
 |Utilisateur|Mot de passe|
 |:---------------:|:---------------:|
-|thomas@tydoo.fr|112233|
+|tydoo|112233|
 
 ### Email
 Pour lire les emails, cliquez sur "Webmail" dans la bare de débug.
