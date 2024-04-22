@@ -10,7 +10,6 @@ use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
 use App\Security\LoginFormAuthenticator;
 use App\Service\SecurityService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +19,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
@@ -29,7 +27,6 @@ class SecurityController extends AbstractController {
     public function __construct(
         private readonly SecurityService $securityService,
         private readonly UserRepository $userRepository,
-        private readonly EntityManagerInterface $em,
         private readonly TranslatorInterface $translator
     ) {
     }
@@ -59,8 +56,7 @@ class SecurityController extends AbstractController {
 
     #[Route('/register', name: '.register')]
     public function register(
-        Request $request,
-        UserPasswordHasherInterface $userPasswordHasher
+        Request $request
     ): Response {
         $this->userIsLoggedIn();
 
@@ -69,17 +65,8 @@ class SecurityController extends AbstractController {
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user->setPassword(
-                $userPasswordHasher->hashPassword(
-                    $user,
-                    $form->get('plainPassword')->getData()
-                )
-            );
 
-            $this->em->persist($user);
-            $this->em->flush();
-
-            $this->securityService->sendEmailConfirmation($user);
+            $this->userRepository->add($user, $form->get('plainPassword')->getData());
 
             $this->addFlash('success', 'Un email de confirmation a été envoyé à votre adresse email.');
 
@@ -111,11 +98,9 @@ class SecurityController extends AbstractController {
             return $this->redirectToRoute('security.register');
         }
 
-        $security->login($user, LoginFormAuthenticator::class);
-
         $this->addFlash('success', 'Votre email a été vérifié. Vous êtes maintenant connecté.');
 
-        return $this->redirectToRoute('home.home');
+        return $security->login($user, LoginFormAuthenticator::class);
     }
 
     #[Route('/forgot-password', name: '.forgot_password')]
@@ -144,8 +129,7 @@ class SecurityController extends AbstractController {
     #[Route('/reset-password', name: '.reset_password')]
     public function resetPassword(
         #[MapQueryParameter] int $id,
-        Request $request,
-        UserPasswordHasherInterface $userPasswordHasher
+        Request $request
     ): Response {
         $this->userIsLoggedIn();
 
@@ -164,14 +148,7 @@ class SecurityController extends AbstractController {
         $form = $this->createForm(ResetPasswordType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->userRepository->upgradePassword(
-                $user,
-                $userPasswordHasher->hashPassword(
-                    $user,
-                    $form->get('password')->getData()
-                )
-            );
-            $this->em->flush();
+            $this->userRepository->upgradePassword($user, $form->get('password')->getData());
 
             $this->addFlash('success', 'Votre mot de passe a été réinitialisé.');
 
