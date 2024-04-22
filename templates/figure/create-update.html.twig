@@ -39,7 +39,16 @@
 							</div>
 						{% endfor %}
 						{% for video in figure.videos %}
-							<iframe class="mt-[2px] flex-shrink-0 flex-none" width="150" height="108" src="{{ video.path }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+							<div>
+								<iframe class="mt-[2px] flex-shrink-0 flex-none" width="150" height="108" src="{{ video.path }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+								<div class="my-2 flex justify-end items-center">
+									<div class="flex border p-1">
+										<a class="btn" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette vidéo ?');" href="{{ path('videos.delete', {id:video.id}) }}">
+											<i class="fa-solid fa-trash fa-sm"></i>
+										</a>
+									</div>
+								</div>
+							</div>
 						{% endfor %}
 					</div>
 					<div class="my-3 mx-4 md:hidden flex justify-center items-center">
