@@ -83,7 +83,7 @@ class SecurityController extends AbstractController {
         #[MapQueryParameter] int $id,
         Request $request,
         Security $security
-    ): RedirectResponse {
+    ): Response {
         $this->userIsLoggedIn();
 
         $user = $this->userRepository->find($id);
